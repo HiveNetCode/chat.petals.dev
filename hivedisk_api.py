@@ -26,7 +26,7 @@ HIVE_TRASH_MID = "f74d181f6865939b2ec0ff130bfea943a5cd289249ea07f581b49f2e6957ac
 HIVE_VOLUME_MID = "283eef7ebee3c2544e450dde97aaee4a297b8d8a70ddfd738c54994bc434cd4e"
 
 
-URL = "http://51.79.27.94:8080"
+URL = "http://57.128.41.80:8080"
 HEADERS = {
     "X-Hive-User-ID": HIVE_USER_ID,
     "X-Hive-User-Key": HIVE_USER_KEY,

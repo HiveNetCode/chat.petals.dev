@@ -27,5 +27,8 @@ COPY . chat.petals.dev/
 WORKDIR /home/chat.petals.dev
 RUN mkdir -p SOURCE_DOCUMENTS
 RUN pip install -r requirements.dell.txt
+RUN pip install sentence-transformers
+RUN pip install langchain-chroma
+RUN pip install chromadb==0.4.3
 
 CMD ["flask", "run","--host","0.0.0.0","--port","9090"]
