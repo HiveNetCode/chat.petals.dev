@@ -98,7 +98,7 @@ def update_from_hiveDisk():
     logger.info(f"Split into {len(texts)} chunks of text")
 
     # Create embeddings
-    device_type = "cuda:1" if torch.cuda.is_available() else "cpu"
+    device_type = "cuda" if torch.cuda.is_available() else "cpu"
     embeddings = HuggingFaceInstructEmbeddings(
         model_name=EMBEDDING_MODEL_NAME,
         model_kwargs={"device": device_type},
@@ -138,7 +138,7 @@ def http_api_update_db():
     logger.info(f"Split into {len(texts)} chunks of text")
 
     # Create embeddings
-    device_type = "cuda:1" if torch.cuda.is_available() else "cpu"
+    device_type = "cuda" if torch.cuda.is_available() else "cpu"
     embeddings = HuggingFaceInstructEmbeddings(
         model_name=EMBEDDING_MODEL_NAME,
         model_kwargs={"device": device_type},
@@ -200,7 +200,7 @@ def http_api_generate():
         max_new_tokens=50,
         do_sample=False,
         #use_cache=False,
-        device=torch.device('cuda:1') #config.DEVICE #"cuda:0"
+        device=torch.device('cuda') #config.DEVICE #"cuda:0"
         )
         #local_llm = HuggingFacePipeline(pipeline=pipe,callbacks=callbacks)
         local_llm = HuggingFacePipeline(pipeline=pipe)
