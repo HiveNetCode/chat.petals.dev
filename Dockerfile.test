@@ -1,0 +1,13 @@
+FROM katakuri100/hivechat-clent-llama70b:dell.zeta
+WORKDIR /home
+# Set en_US.UTF-8 locale by default
+RUN echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+
+VOLUME /root/.cache
+
+COPY . /home/chat.petals.dev/
+VOLUME /home/chat.petals.dev/SOURCE_DOCUMENTS
+WORKDIR /home/chat.petals.dev
+RUN pip install sentence-transformers
+RUN pip install langchain-chroma
+RUN pip install chromadb==0.4.3
