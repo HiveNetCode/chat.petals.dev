@@ -170,7 +170,7 @@ class User:
             self.access_token = data["access_token"]
             self.token_date = time.time()
             return 1
-        else:path=SOURCE_DIRECTORY
+        else:
             print('Error refreshing token:', response.status_code, response.text)
             return None
 
