@@ -170,7 +170,7 @@ class User:
             self.access_token = data["access_token"]
             self.token_date = time.time()
             return 1
-        else:
+        else:path=SOURCE_DIRECTORY
             print('Error refreshing token:', response.status_code, response.text)
             return None
 
@@ -305,12 +305,13 @@ def get_files_legacy(user, filelist, path=PATH, extensions=EXTENSIONS):
             continue
         get_file(user, filename, mid, path)
 
-def main(filename=FILENAME):
+def main(filename=FILENAME, path="./", extensions=EXTENSIONS):
     user = load_user(filename)
     if user.refresh_access_token() is not None:
         save_user(user, filename)
     files = list_all_files(user)
-    return files
+    get_files(user, files, path, extensions)
+    return user, files
 
 if __name__ == "__main__":
     assert len(sys.argv) > 1
