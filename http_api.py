@@ -80,8 +80,8 @@ EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
 
 @app.post("/api/v1/gethivedisk")
 def update_from_hiveDisk():
-    file_list = hivedisk_api.list_all_files()
-    logger.info(f"HiveDisk files List: {file_list}")
+    file_list = hivedisk_api.main()
+    #logger.info(f"HiveDisk files List: {file_list}")
     hivedisk_api.get_files(filelist=file_list,path=SOURCE_DIRECTORY)
     logger.info(f"HiveDisk files Downloaded into: {SOURCE_DIRECTORY} !!")
     # Load documents and split in chunks
