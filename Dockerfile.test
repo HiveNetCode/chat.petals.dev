@@ -11,3 +11,5 @@ WORKDIR /home/chat.petals.dev
 RUN pip install sentence-transformers
 RUN pip install langchain-chroma
 RUN pip install chromadb==0.4.3
+RUN pip install webbrowser
+RUN pip install binascii
