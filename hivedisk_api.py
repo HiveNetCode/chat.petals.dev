@@ -167,8 +167,9 @@ class User:
         response = requests.post(token_url, data=data)
         if response.status_code == 200:
             data = response.json()
-            self.access_token = data["access_token"]
+            self.token = data["access_token"]
             self.token_date = time.time()
+            self.headers["Authorization"] = "Bearer " + self.token
             return 1
         else:
             print('Error refreshing token:', response.status_code, response.text)
@@ -311,7 +312,7 @@ def main(filename=FILENAME, path="./", extensions=EXTENSIONS):
         save_user(user, filename)
     files = list_all_files(user)
     get_files(user, files, path, extensions)
-    return user, files
+    return files
 
 if __name__ == "__main__":
     assert len(sys.argv) > 1
