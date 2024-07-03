@@ -178,12 +178,27 @@ def ws_api_generate(ws):
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )
         def run_enhanced_rqa(message):
-            qa.run(message)
+            # Retrieve context
+            retrieved_docs = retriever.retrieve(message)
+            context = ' '.join([doc.page_content for doc in retrieved_docs])
+    
+            # Truncate context to fit within 2048 tokens combined with the question
+            truncated_context = truncate_to_fit(context, message, 2048)
+    
+            # Prepare the input with truncated context
+            input_data = {
+                "context": truncated_context,
+                "question": message
+             }
+    
+            # Run the QA chain
+            qa.run(input_data)
+            #qa.run(message)
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
         t.start()
 
-        max_token = 150
+        max_token = 1024
         index = 0 
         stop = False
         sequence = ""
@@ -351,3 +366,15 @@ def ws_api_generate(ws):
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
+        
+
+# Function to truncate context to a maximum token length
+def truncate_to_fit(context, question, max_tokens):
+    question_tokens = question.split()
+    context_tokens = context.split()
+    
+    if len(question_tokens) + len(context_tokens) > max_tokens:
+        context_tokens = context_tokens[:max_tokens - len(question_tokens)]
+    
+    return ' '.join(context_tokens)
+
