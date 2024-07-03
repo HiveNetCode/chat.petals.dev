@@ -347,7 +347,7 @@ def ws_api_generate(ws):
         pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
-        ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 7, "route":json.dumps(GLOBAL_MAP)}))
+        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP)}))
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
