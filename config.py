@@ -14,6 +14,16 @@ default_chat_config = ModelChatConfig(
 
 MODEL_FAMILIES = {
     "Mistral": [
+         ModelConfig(
+            ModelBackendConfig(repository="mistralai/Mixtral-8x7B-Instruct-v0.1"),
+            ModelFrontendConfig(
+                name="Mixtral-8x7B",
+                model_card="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+                license="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/tree/main",
+            ),
+            default_chat_config,
+        ),
+         '''
         ModelConfig(
             ModelBackendConfig(repository="mistralai/Mistral-7B-v0.1"),
             ModelFrontendConfig(
@@ -23,6 +33,7 @@ MODEL_FAMILIES = {
             ),
             default_chat_config,
         ),
+        '''
     ],
     "Llama 2": [
         ModelConfig(

@@ -1,4 +1,5 @@
-git+https://github.com/HiveNetCode/petals.git@hive_mistral-v1.0
+#git+https://github.com/HiveNetCode/petals.git@hive_mistral-v1.0
+git+https://github.com/bigscience-workshop/petals
 Flask
 flask-sock
 flask-cors
