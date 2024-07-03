@@ -19,12 +19,12 @@ MODELS = [
     #ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
     #ModelInfo(repo="huggyllama/llama-65b"),
     #ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
-    ModelInfo(repo="mistralai/Mistral-7B-v0.1"),
+    ModelInfo(repo="mistralai/Mixtral-8x7B-Instruct-v0.1"),
     #ModelInfo(repo="huggyllama/llama-7b"),
     #ModelInfo(repo="tiiuae/falcon-180B-chat"),
     #ModelInfo(repo="bigscience/bloomz"),
 ]
-DEFAULT_MODEL_NAME = "mistralai/Mistral-7B-v0.1"
+DEFAULT_MODEL_NAME = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 #DEFAULT_MODEL_NAME = "tiiuae/falcon-180B-chat"
 
 #INITIAL_PEERS = PUBLIC_INITIAL_PEERS

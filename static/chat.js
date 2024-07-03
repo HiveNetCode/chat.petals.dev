@@ -7,6 +7,14 @@ const models = {
     stopToken: "###",
     extraStopSequences: ["</s>"],
   },
+  "mistralai/Mixtral-8x7B-Instruct-v0.1": {
+    modelCard: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+    license: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/tree/main",
+    maxSessionLength: 2048,
+    sepToken: "###",
+    stopToken: "###",
+    extraStopSequences: ["</s>"],
+  },
   "huggyllama/llama-7b": {
     modelCard: "https://huggingface.co/huggyllama/llama-7b",
     license: "https://huggingface.co/huggyllama/llama-7b/blob/main/LICENSE",
@@ -57,7 +65,7 @@ const models = {
   },
 };
 const falconModel = "tiiuae/falcon-180B-chat";
-var curModel = "mistralai/Mistral-7B-v0.1"; //"stabilityai/StableBeluga2";
+var curModel = "mistralai/Mixtral-8x7B-Instruct-v0.1"; //"stabilityai/StableBeluga2";
 
 const generationParams = {
   do_sample: 1,
@@ -130,8 +138,7 @@ function sendReplica() {
         '<span class="generation-controls"><a class="stop-generation" href=#>stop generation</a></span>' +
         '<span class="suggest-join" style="display: none;">' +
           '<b>Too slow?</b> ' +
-          '<a target="_blank" href="https://github.com/bigscience-workshop/petals#connect-your-gpu-and-increase-petals-capacity">Connect your GPU</a> ' +
-          'and increase Petals capacity!' +
+          'Connect more GPUs to increase the cluster capacity!' +
         '</span>' +
       '</p>'));
     animateLoading();
