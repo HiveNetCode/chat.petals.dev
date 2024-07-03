@@ -179,7 +179,7 @@ def ws_api_generate(ws):
         )
         def run_enhanced_rqa(message):
             # Retrieve context
-            retrieved_docs = retriever.retrieve(message)
+            retrieved_docs = retriever.get_relevant_documents(message)
             context = ' '.join([doc.page_content for doc in retrieved_docs])
     
             # Truncate context to fit within 2048 tokens combined with the question
