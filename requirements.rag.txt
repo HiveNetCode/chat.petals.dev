@@ -4,7 +4,7 @@ flask-sock
 flask-cors
 
 # Natural Language Processing
-chromadb>=0.4.3
+chromadb==0.4.3
 llama-cpp-python==0.1.78
 pdfminer.six==20221105
 InstructorEmbedding
@@ -12,10 +12,10 @@ faiss-cpu
 huggingface_hub
 transformers
 
-langchain>=0.1.2
+langchain==0.1.2
 langchain-community
 langchain-chroma
-sentence_transformers>=2.2.2
+sentence_transformers==2.2.2
 
 gunicorn[gthread]
 protobuf==3.20.0; sys_platform == 'darwin' and platform_machine != 'arm64'
