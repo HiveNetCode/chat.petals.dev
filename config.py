@@ -23,17 +23,6 @@ MODEL_FAMILIES = {
             ),
             default_chat_config,
         ),
-         '''
-        ModelConfig(
-            ModelBackendConfig(repository="mistralai/Mistral-7B-v0.1"),
-            ModelFrontendConfig(
-                name="Mistral-7B",
-                model_card="https://huggingface.co/mistralai/Mistral-7B-v0.1",
-                license="https://huggingface.co/mistralai/Mistral-7B-v0.1/tree/main",
-            ),
-            default_chat_config,
-        ),
-        '''
     ],
     "Llama 2": [
         ModelConfig(
