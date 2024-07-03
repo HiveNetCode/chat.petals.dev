@@ -158,7 +158,7 @@ def ws_api_generate(ws):
         #a = StreamingStdOutCallbackHandler()
         #a.on_llm_new_token()
         #callbacks.append().on_llm_new_token()
-        retriever = db.as_retriever(search_kwargs={'k': 2})
+        retriever = db.as_retriever(search_kwargs={'k': 3})
         template = """Use the following pieces of context to answer the question at the end. If you don't know the answer,\
         just say that you don't know, don't try to make up an answer.
 
@@ -178,22 +178,7 @@ def ws_api_generate(ws):
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )
         def run_enhanced_rqa(message):
-            # Retrieve context
-            retrieved_docs = retriever.get_relevant_documents(message)
-            context = ' '.join([doc.page_content for doc in retrieved_docs])
-    
-            # Truncate context to fit within 2048 tokens combined with the question
-            truncated_context = truncate_to_fit(context, message, 2048)
-    
-            # Prepare the input with truncated context
-            input_data = {
-                "context": truncated_context,
-                "question": message
-             }
-    
-            # Run the QA chain
-            qa.run(input_data)
-            #qa.run(message)
+            qa.run(message)
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
         t.start()
