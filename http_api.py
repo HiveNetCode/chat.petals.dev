@@ -22,19 +22,9 @@ from chromadb.config import Settings
 from langchain.document_loaders import CSVLoader, PDFMinerLoader, TextLoader, UnstructuredExcelLoader, Docx2txtLoader
 
 logger = hivemind.get_logger(__file__)
-ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
-# Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
-PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
-
 
 # Can be changed to a specific number
 INGEST_THREADS = os.cpu_count() or 8
-# Define the Chroma settings
-CHROMA_SETTINGS = Settings(
-    anonymized_telemetry=False,
-    is_persistent=True,
-)
 DOCUMENT_MAP = {
     ".txt": TextLoader,
     ".md": TextLoader,
@@ -66,26 +56,25 @@ from langchain.prompts import ChatPromptTemplate
 #Houssam
 import hivedisk_api
 
-EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
-ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+#ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 # Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/"
-PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
+#SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/"
+#PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 
 # Default Instructor Model
-EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
+#EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
 # Houssam Import
 
 
 
 @app.post("/api/v1/gethivedisk")
 def update_from_hiveDisk():
-    file_list = hivedisk_api.main(path=SOURCE_DIRECTORY)
+    file_list = hivedisk_api.main(path=config.SOURCE_DIRECTORY)
     logger.info(f"HiveDisk files List: {file_list}")
-    logger.info(f"HiveDisk files Downloaded into: {SOURCE_DIRECTORY} !!")
+    logger.info(f"HiveDisk files Downloaded into: {config.SOURCE_DIRECTORY} !!")
     # Load documents and split in chunks
-    logger.info(f"Loading HiveDisk documents from {SOURCE_DIRECTORY}")
-    documents = load_documents(SOURCE_DIRECTORY)
+    logger.info(f"Loading HiveDisk documents from {config.SOURCE_DIRECTORY}")
+    documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     python_splitter = RecursiveCharacterTextSplitter.from_language(
@@ -93,21 +82,21 @@ def update_from_hiveDisk():
     )
     texts = text_splitter.split_documents(text_documents)
     texts.extend(python_splitter.split_documents(python_documents))
-    logger.info(f"Loaded {len(documents)} documents from {SOURCE_DIRECTORY}")
+    logger.info(f"Loaded {len(documents)} documents from {config.SOURCE_DIRECTORY}")
     logger.info(f"Split into {len(texts)} chunks of text")
 
     # Create embeddings
     device_type = "cuda" if torch.cuda.is_available() else "cpu"
     embeddings = HuggingFaceInstructEmbeddings(
-        model_name=EMBEDDING_MODEL_NAME,
+        model_name=config.EMBEDDING_MODEL_NAME,
         model_kwargs={"device": device_type},
     )
 
     db = Chroma.from_documents(
         texts,
         embeddings,
-        persist_directory=PERSIST_DIRECTORY,
-        client_settings=CHROMA_SETTINGS,
+        persist_directory=config.PERSIST_DIRECTORY,
+        client_settings=config.CHROMA_SETTINGS,
 
     )
     logger.info(f"Knowledge DB Updated with HiveDisk Data !!")
@@ -121,11 +110,11 @@ def http_api_update_db():
     for file in uploaded_files:
         filename = secure_filename(file.filename)
         if filename != '':
-            file.save(os.path.join(SOURCE_DIRECTORY, filename))
+            file.save(os.path.join(config.SOURCE_DIRECTORY, filename))
     
     # Load documents and split in chunks
-    logger.info(f"Loading documents from {SOURCE_DIRECTORY}")
-    documents = load_documents(SOURCE_DIRECTORY)
+    logger.info(f"Loading documents from {config.SOURCE_DIRECTORY}")
+    documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     python_splitter = RecursiveCharacterTextSplitter.from_language(
@@ -133,21 +122,21 @@ def http_api_update_db():
     )
     texts = text_splitter.split_documents(text_documents)
     texts.extend(python_splitter.split_documents(python_documents))
-    logger.info(f"Loaded {len(documents)} documents from {SOURCE_DIRECTORY}")
+    logger.info(f"Loaded {len(documents)} documents from {config.SOURCE_DIRECTORY}")
     logger.info(f"Split into {len(texts)} chunks of text")
 
     # Create embeddings
     device_type = "cuda" if torch.cuda.is_available() else "cpu"
     embeddings = HuggingFaceInstructEmbeddings(
-        model_name=EMBEDDING_MODEL_NAME,
+        model_name=config.EMBEDDING_MODEL_NAME,
         model_kwargs={"device": device_type},
     )
 
     db = Chroma.from_documents(
         texts,
         embeddings,
-        persist_directory=PERSIST_DIRECTORY,
-        client_settings=CHROMA_SETTINGS,
+        persist_directory=config.PERSIST_DIRECTORY,
+        client_settings=config.CHROMA_SETTINGS,
 
     )
 
@@ -205,8 +194,9 @@ def http_api_generate():
         local_llm = HuggingFacePipeline(pipeline=pipe)
         #embeddings = HuggingFaceInstructEmbeddings(model_name=EMBEDDING_MODEL_NAME, model_kwargs={"device": config.DEVICE})
         db = Chroma(
-            persist_directory=PERSIST_DIRECTORY,
+            persist_directory=config.PERSIST_DIRECTORY,
             embedding_function=embeddings,
+             client_settings=config.CHROMA_SETTINGS,
         )
         #a = StreamingStdOutCallbackHandler()
         #a.on_llm_new_token()

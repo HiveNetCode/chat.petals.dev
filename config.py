@@ -5,7 +5,7 @@ from typing import Optional
 import torch
 
 from petals.constants import PUBLIC_INITIAL_PEERS
-
+from chromadb.config import Settings
 
 @dataclass
 class ModelInfo:
@@ -25,6 +25,16 @@ MODELS = [
     #ModelInfo(repo="bigscience/bloomz"),
 ]
 DEFAULT_MODEL_NAME = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
+# Define the Chroma settings
+CHROMA_SETTINGS = Settings(
+    anonymized_telemetry=False,
+    is_persistent=True,
+)
+ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+# Define the folder for storing database
+SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
+PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 #DEFAULT_MODEL_NAME = "tiiuae/falcon-180B-chat"
 
 #INITIAL_PEERS = PUBLIC_INITIAL_PEERS

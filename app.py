@@ -17,22 +17,12 @@ from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.llms import HuggingFacePipeline, LlamaCpp
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
-from langchain.vectorstores import Chroma
 import os
 import torch
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.prompts import ChatPromptTemplate
-
-# from dotenv import load_dotenv
-from chromadb.config import Settings
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 callbacks = [StreamingStdOutCallbackHandler()]
-
-EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
-ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
-# Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
-PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 
 logger = hivemind.get_logger(__file__)
 #-----------------------------------
@@ -110,7 +100,7 @@ for model_info in config.MODELS:
     )
     model = model.to(config.DEVICE)
     generation_config = GenerationConfig.from_pretrained(model_info.repo)
-    embeddings = HuggingFaceInstructEmbeddings(model_name=EMBEDDING_MODEL_NAME, model_kwargs={"device": config.DEVICE})
+    embeddings = HuggingFaceInstructEmbeddings(model_name=config.EMBEDDING_MODEL_NAME, model_kwargs={"device": config.DEVICE})
     model_name = model_info.name
     if model_name is None:  # Use default name based on model/repo repo
         model_name = model_info.adapter if model_info.adapter is not None else model_info.repo

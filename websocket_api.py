@@ -28,12 +28,6 @@ import torch
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.prompts import ChatPromptTemplate
 
-EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
-ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
-# Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
-PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
-
 logger = hivemind.get_logger(__file__)
 
 logger = hivemind.get_logger(__file__)
@@ -156,8 +150,9 @@ def ws_api_generate(ws):
         local_llm = HuggingFacePipeline(pipeline=pipe)
         #embeddings = HuggingFaceInstructEmbeddings(model_name=EMBEDDING_MODEL_NAME, model_kwargs={"device": config.DEVICE})
         db = Chroma(
-            persist_directory=PERSIST_DIRECTORY,
+            persist_directory=config.PERSIST_DIRECTORY,
             embedding_function=embeddings,
+            client_settings=config.CHROMA_SETTINGS,
         )
         #a = StreamingStdOutCallbackHandler()
         #a.on_llm_new_token()
