@@ -124,7 +124,7 @@ def ws_api_generate(ws):
         else:
             n_input_tokens = 0
         
-        max_ctx_size = 20480 #2048
+        max_ctx_size = 2048 #2048
         kwargs = {
             "n_ctx": max_ctx_size,
             "max_tokens": max_ctx_size,
@@ -136,7 +136,7 @@ def ws_api_generate(ws):
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        config={'max_length': 20480},
+        config={'max_length': 2048},
         generation_config=generation_config,
         model_kwargs=kwargs,
         use_fast=True,
@@ -173,7 +173,7 @@ def ws_api_generate(ws):
         qa = RetrievalQA.from_chain_type(
             llm=local_llm, #model,
             chain_type="stuff",
-            retriever=retriever,
+            retriever=retriever, #reduce_k_below_max_tokens=True,
             return_source_documents=False,
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )

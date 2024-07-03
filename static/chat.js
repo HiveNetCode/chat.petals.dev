@@ -10,7 +10,7 @@ const models = {
   "mistralai/Mixtral-8x7B-Instruct-v0.1": {
     modelCard: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
     license: "https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/tree/main",
-    maxSessionLength: 20480,
+    maxSessionLength: 2048,
     sepToken: "###",
     stopToken: "###",
     extraStopSequences: ["</s>"],

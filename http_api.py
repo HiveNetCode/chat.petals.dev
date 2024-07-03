@@ -170,7 +170,7 @@ def http_api_generate():
             #n_input_tokens = inputs.shape[1]
         #else:
             #n_input_tokens = 0
-        max_ctx_size = 20480 #2048
+        max_ctx_size = 2048 #2048
         kwargs = {
             "n_ctx": max_ctx_size,
             "max_tokens": max_ctx_size,
