@@ -19,12 +19,12 @@ MODELS = [
     #ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
     #ModelInfo(repo="huggyllama/llama-65b"),
     #ModelInfo(repo="huggyllama/llama-65b", adapter="timdettmers/guanaco-65b"),
-    ModelInfo(repo="mistralai/Mixtral-8x7B-Instruct-v0.1"),
+    ModelInfo(repo="meta-llama/Llama-2-70b-chat-hf"),
     #ModelInfo(repo="huggyllama/llama-7b"),
     #ModelInfo(repo="tiiuae/falcon-180B-chat"),
     #ModelInfo(repo="bigscience/bloomz"),
 ]
-DEFAULT_MODEL_NAME = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+DEFAULT_MODEL_NAME = "meta-llama/Llama-2-70b-chat-hf"
 EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
 # Define the Chroma settings
 CHROMA_SETTINGS = Settings(
