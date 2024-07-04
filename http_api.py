@@ -76,7 +76,7 @@ def update_from_hiveDisk():
     logger.info(f"Loading HiveDisk documents from {config.SOURCE_DIRECTORY}")
     documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=100)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
     python_splitter = RecursiveCharacterTextSplitter.from_language(
         language=Language.PYTHON, chunk_size=512, chunk_overlap=100
     )
