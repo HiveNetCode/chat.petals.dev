@@ -66,15 +66,15 @@
           <div class="welcome mb-4">
             <div>
               <b>Welcome!</b> This is a demo app running
-              <a target="_blank" class="model-name" href="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1">Mixtral-8x7B-Instruct-v0.1</a>
+              <a target="_blank" class="model-name" href="https://huggingface.co/meta-llama/Llama-2-70b-chat-hf">Llama-2-70b-chat-hf</a>
               over a private <a target="_blank" href="http://57.128.41.80:31888/">cluster</a>.
             </div>
             <form id="settings">
               <div class="mt-2">
                 <label class="group-label">Family:</label>
                 <div class="btn-group family-selector" role="group">
-                  <input type="radio" class="btn-check" name="family" value="mistral" id="family-mistral" checked>
-                  <label class="btn btn-outline-primary" for="family-mistral">Mistral</label>
+                  <input type="radio" class="btn-check" name="family" value="llma2" id="family-llama2" checked>
+                  <label class="btn btn-outline-primary" for="family-llama2">Llama 2</label>
 
                  <!-- <input type="radio" class="btn-check" name="family" value="llama" id="family-llama">
                   <label class="btn btn-outline-primary" for="family-llama">Llama</label>-->
@@ -84,9 +84,9 @@
               <div class="mt-2">
                 <label class="group-label">Model:</label>
                 
-                <div class="model-selector btn-group" role="group" data-family="mistral" >
-                  <input type="radio" class="btn-check" name="model" value="mistralai/Mixtral-8x7B-Instruct-v0.1" id="Mixtral-8x7B-Instruct-v0.1" checked>
-                  <label class="btn btn-outline-primary" for="Mixtral-8x7B-Instruct-v0.1">Mixtral-8x7B</label>
+                <div class="model-selector btn-group" role="group" data-family="llama2" >
+                  <input type="radio" class="btn-check" name="model" value="meta-llama/Llama-2-70b-chat-hf" id="Llama-2-70b-chat-hf" checked>
+                  <label class="btn btn-outline-primary" for="Llama-2-70b-chat-hf">Llama 2 (70B-Chat)</label>
                 </div>
 
                 <!--<div class="model-selector btn-group" role="group" data-family="llama" style="display: none;">
