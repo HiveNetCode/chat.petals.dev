@@ -2,6 +2,7 @@ git+https://github.com/bigscience-workshop/petals
 Flask
 flask-sock
 flask-cors
+kaggle
 
 # Natural Language Processing
 chromadb>=0.4.3

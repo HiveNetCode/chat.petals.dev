@@ -33,7 +33,8 @@ CHROMA_SETTINGS = Settings(
 )
 ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 # Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/"
+SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/questionanswer-dataset/text_data/"
+KAGGLE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
 PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 #DEFAULT_MODEL_NAME = "tiiuae/falcon-180B-chat"
 
@@ -64,3 +65,4 @@ else:
 
 STEP_TIMEOUT = 5 * 60
 MAX_SESSIONS = 50  # Has effect only for API v1 (HTTP-based)
+KAGGLE_DATASET = "rtatman/questionanswer-dataset"

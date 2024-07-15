@@ -24,6 +24,7 @@ RUN conda install python~=3.10.12 pip && \
 VOLUME /root/.cache
 
 COPY . chat.petals.dev/
+COPY kaggle.json .kaggle/
 WORKDIR /home/chat.petals.dev
 RUN mkdir -p SOURCE_DOCUMENTS
 VOLUME /home/chat.petals.dev/SOURCE_DOCUMENTS

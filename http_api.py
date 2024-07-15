@@ -21,6 +21,8 @@ from chromadb.config import Settings
 # https://python.langchain.com/en/latest/modules/indexes/document_loaders/examples/excel.html?highlight=xlsx#microsoft-excel
 from langchain.document_loaders import CSVLoader, PDFMinerLoader, TextLoader, UnstructuredExcelLoader, Docx2txtLoader
 
+from kaggle.api.kaggle_api_extended import KaggleApi
+
 logger = hivemind.get_logger(__file__)
 
 # Can be changed to a specific number
@@ -68,12 +70,16 @@ import hivedisk_api
 
 
 @app.post("/api/v1/gethivedisk")
-def update_from_hiveDisk():
-    file_list = hivedisk_api.main(path=config.SOURCE_DIRECTORY)
-    logger.info(f"HiveDisk files List: {file_list}")
-    logger.info(f"HiveDisk files Downloaded into: {config.SOURCE_DIRECTORY} !!")
+def update_from_kaggle():
+    # Initialize the Kaggle API
+    kaggleApi = KaggleApi()
+    kaggleApi.authenticate()
+    logger.info(f"kaggle authentication OK")
+    logger.info(f"Downloading [{config.KAGGLE_DATASET}] from kaggle into: {config.KAGGLE_DIRECTORY} ...")
+    kaggleApi.dataset_download_files(config.KAGGLE_DATASET, path=config.KAGGLE_DIRECTORY, unzip=True)
+    logger.info(f"Kaggle dataset Downloaded into: {config.KAGGLE_DIRECTORY} !!")
     # Load documents and split in chunks
-    logger.info(f"Loading HiveDisk documents from {config.SOURCE_DIRECTORY}")
+    logger.info(f"Loading Kaggle documents from {config.SOURCE_DIRECTORY}")
     documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=20)
@@ -99,7 +105,7 @@ def update_from_hiveDisk():
         client_settings=config.CHROMA_SETTINGS,
 
     )
-    logger.info(f"Knowledge DB Updated with HiveDisk Data !!")
+    logger.info(f"Knowledge DB Updated with Kaggle Dataset !!")
     return "OK"
     
 
