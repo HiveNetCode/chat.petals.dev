@@ -29,6 +29,7 @@ logger = hivemind.get_logger(__file__)
 INGEST_THREADS = os.cpu_count() or 8
 DOCUMENT_MAP = {
     ".txt": TextLoader,
+    ".clean": TextLoader,
     ".md": TextLoader,
     ".py": TextLoader,
     ".pdf": PDFMinerLoader,
