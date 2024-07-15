@@ -182,7 +182,7 @@ def ws_api_generate(ws):
         why instead of answering something not correct. If you don't know the answer 
         to a question, please don't share false information.
 
-        Your goal is to provide answers based only on the pieces of context you receive from the company private knowledge database. If you cannot guess the answer from the provided contexts,
+        Your goal is to provide answers based only on the pieces of context you receive from the company private knowledge database. If you cannot guess the answer from the provided contexts or if the context is empty,
         please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
 
         {context}
