@@ -100,8 +100,8 @@ def update_from_kaggle():
     )
 
     db = Chroma.from_documents(
-        texts,
-        embeddings,
+        documents=texts,
+        embedding=embeddings,
         persist_directory=config.PERSIST_DIRECTORY,
         client_settings=config.CHROMA_SETTINGS,
 
