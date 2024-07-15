@@ -183,7 +183,7 @@ def ws_api_generate(ws):
         why instead of answering something not correct. If you don't know the answer 
         to a question, please don't share false information.
 
-        Your goal is to provide answers based on the pieces of context you received from the company private knowledge database. Please provide a clean answer rid of meta data tag or characters.
+        Your goal is to provide answers based only on the pieces of context you received from the company private knowledge database. If the answer cannot be infered from the provided contexts, indicate that you're providing your own answer based on your own knowledge. Please provide a clean answer rid of meta data tag or characters.
 
         {context}
 
