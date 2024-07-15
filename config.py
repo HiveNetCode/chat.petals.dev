@@ -33,7 +33,7 @@ CHROMA_SETTINGS = Settings(
 )
 ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 # Define the folder for storing database
-SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/questionanswer-dataset/text_data/"
+SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/text_data/"
 KAGGLE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
 PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 #DEFAULT_MODEL_NAME = "tiiuae/falcon-180B-chat"

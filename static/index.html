@@ -41,7 +41,7 @@
               resultMessage2.style.display = "block";
             })
             .catch((error) => {
-              console.error("Error updating from HiveDisk:", error);
+              console.error("Error updating from Kaggle:", error);
               loadingIndicator2.style.display = "none";
               resultMessage2.style.display = "none";
             });
@@ -100,7 +100,7 @@
             <div>
               <form id="hivediskForm" method="POST" action="">
                 <div class="form-group">
-                  <label for="loadButton"><b>Update From HiveDisk:</b></label>
+                  <label for="loadButton"><b>Update From Kaggle:</b></label>
                   <div class="submit-container">
                     <input type="submit" id="loadButton" value="Load">
                     <div id="loading-indicator2"></div>
