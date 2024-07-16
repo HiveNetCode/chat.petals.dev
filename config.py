@@ -66,3 +66,4 @@ else:
 STEP_TIMEOUT = 5 * 60
 MAX_SESSIONS = 50  # Has effect only for API v1 (HTTP-based)
 KAGGLE_DATASET = "rtatman/questionanswer-dataset"
+STOP_TOKEN = "###"

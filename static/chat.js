@@ -126,7 +126,7 @@ function isWaitingForInputs() {
 
 function sendReplica() {
   if (isWaitingForInputs()) {
-    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'Assistant:' : '';
+    const aiPrompt = (curRegime === Regime.CHATBOT) ? 'Assistant: ' : '';
     $('.human-replica:last').text($('.human-replica:last textarea').val());
     $('.dialogue').append($(
       '<div class="route-box" style="display: none;"></div><br>' +
