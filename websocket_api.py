@@ -193,7 +193,7 @@ def ws_api_generate(ws):
         
         def run_enhanced_rqa(message):
             GLOBAL_REFERENCES = []
-            response = qa.run(message)
+            response = qa(message)
             answer, docs = response["result"], response["source_documents"]
             for document in docs:
                 GLOBAL_REFERENCES.append(document.metadata["source"])
