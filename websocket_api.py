@@ -197,7 +197,8 @@ def ws_api_generate(ws):
             answer, docs = response["result"], response["source_documents"]
             for document in docs:
                 GLOBAL_REFERENCES.append(document.metadata["source"])
-                logger.info(f"reference[i] = {document.metadata["source"]}")
+                ref = document.metadata["source"]
+                logger.info(f"reference[i] = {ref}")
             
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
