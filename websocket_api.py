@@ -186,7 +186,7 @@ def ws_api_generate(ws):
         qa = RetrievalQA.from_chain_type(
             llm=local_llm, #model,
             chain_type="stuff",
-            #retriever=retriever, #reduce_k_below_max_tokens=True,
+            retriever=retriever, #reduce_k_below_max_tokens=True,
             return_source_documents=False,
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )
