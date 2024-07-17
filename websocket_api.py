@@ -37,13 +37,13 @@ GLOBAL_MAP = {}
 GLOBAL_NAME = ""
 GLOBAL_REFERENCES = []
 lock = threading.Lock()
+lock1 = threading.Lock()
 isDummyRunning = False
 
 def run_dummy_session(model,tokenizer,name):
     
     global GLOBAL_MAP
     global GLOBAL_NAME
-    global GLOBAL_REFERENCES
     #with lock:
     #    if len(GLOBAL_MAP) > 0:
     #        logger.info(f"HIVE: DummyPath via: {GLOBAL_MAP}")
@@ -72,6 +72,7 @@ def run_dummy_session(model,tokenizer,name):
 
 @sock.route("/api/v2/generate")
 def ws_api_generate(ws):
+    #global GLOBAL_REFERENCES
     try:
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session" #"generate"   
@@ -87,7 +88,6 @@ def ws_api_generate(ws):
         model, tokenizer,generation_config,embeddings = models[model_name]
         global GLOBAL_MAP
         global GLOBAL_NAME
-        global GLOBAL_REFERENCES
         if len(GLOBAL_MAP) <= 1 or GLOBAL_NAME != model_name:
             GLOBAL_MAP = {}
             dummySession = threading.Thread(target=run_dummy_session, args=(model,tokenizer,model_name))
@@ -172,7 +172,7 @@ def ws_api_generate(ws):
 
         Your goal is to provide answers based only on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
         the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot guess the answer from the provided contexts or if the context is empty,
-        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters, just keep the STOP_TOKEN ###.
+        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
 
         {context}
 
@@ -193,20 +193,22 @@ def ws_api_generate(ws):
 
         def get_references(message):
             global GLOBAL_REFERENCES
-            GLOBAL_REFERENCES = []
-            # Retrieve context documents
-            retrieved_docs = retriever.get_relevant_documents(message)
-            GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
-            logger.info(f"reference list 1 = {GLOBAL_REFERENCES}")
-            logger.info(f"reference raw docs = {retrieved_docs}")
+            with lock1:
+                GLOBAL_REFERENCES = []
+                # Retrieve context documents
+                retrieved_docs = retriever.get_relevant_documents(message)
+                GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
+                logger.info(f"reference list 1 = {GLOBAL_REFERENCES}")
+                logger.info(f"reference raw docs = {retrieved_docs}")
         def run_enhanced_rqa(message):
             qa.run(message)
             
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
         t1 = threading.Thread(target=get_references, args=(UserInput,))
-        t.start()
         t1.start()
+        t1.join()
+        t.start()
         logger.info(f"reference list = {GLOBAL_REFERENCES}")
 
         max_token = 1024
