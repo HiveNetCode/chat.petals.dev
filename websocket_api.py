@@ -202,7 +202,7 @@ def ws_api_generate(ws):
             GLOBAL_REFERENCES = []
             retrieved_docs = retriever.get_relevant_documents(message)
             GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
-            context = " ".join([doc['text'] for doc in retrieved_docs])
+            context = " ".join([doc.page_content for doc in retrieved_docs])
             qa.run({"context": context, "question": message})
             
 
