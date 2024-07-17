@@ -197,17 +197,16 @@ def ws_api_generate(ws):
             # Retrieve context documents
             retrieved_docs = retriever.get_relevant_documents(message)
             GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
+            logger.info(f"reference list 1 = {GLOBAL_REFERENCES}")
+            logger.info(f"reference raw docs = {retrieved_docs}")
         def run_enhanced_rqa(message):
-            global GLOBAL_REFERENCES
-            GLOBAL_REFERENCES = []
-            retrieved_docs = retriever.get_relevant_documents(message)
-            GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
-            context = " ".join([doc.page_content for doc in retrieved_docs])
-            qa.run({"context": context, "query": message})
+            qa.run(message)
             
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
+        t1 = threading.Thread(target=get_references, args=(UserInput,))
         t.start()
+        t1.start()
         logger.info(f"reference list = {GLOBAL_REFERENCES}")
 
         max_token = 1024
