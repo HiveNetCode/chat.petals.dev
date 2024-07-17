@@ -87,6 +87,7 @@ def ws_api_generate(ws):
         model, tokenizer,generation_config,embeddings = models[model_name]
         global GLOBAL_MAP
         global GLOBAL_NAME
+        global GLOBAL_REFERENCES
         if len(GLOBAL_MAP) <= 1 or GLOBAL_NAME != model_name:
             GLOBAL_MAP = {}
             dummySession = threading.Thread(target=run_dummy_session, args=(model,tokenizer,model_name))
@@ -185,20 +186,24 @@ def ws_api_generate(ws):
         qa = RetrievalQA.from_chain_type(
             llm=local_llm, #model,
             chain_type="stuff",
-            retriever=retriever, #reduce_k_below_max_tokens=True,
-            return_source_documents=True,
+            #retriever=retriever, #reduce_k_below_max_tokens=True,
+            return_source_documents=False,
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )
 
-        
-        def run_enhanced_rqa(message):
+        def get_references(message):
+            global GLOBAL_REFERENCES
             GLOBAL_REFERENCES = []
-            response = qa(message)
-            answer, docs = response["result"], response["source_documents"]
-            for document in docs:
-                GLOBAL_REFERENCES.append(document.metadata["source"])
-                ref = document.metadata["source"]
-                logger.info(f"reference[i] = {ref}")
+            # Retrieve context documents
+            retrieved_docs = retriever.get_relevant_documents(message)
+            GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
+        def run_enhanced_rqa(message):
+            global GLOBAL_REFERENCES
+            GLOBAL_REFERENCES = []
+            retrieved_docs = retriever.get_relevant_documents(message)
+            GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
+            context = " ".join([doc['text'] for doc in retrieved_docs])
+            qa.run({"context": context, "question": message})
             
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
