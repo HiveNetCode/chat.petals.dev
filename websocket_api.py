@@ -35,9 +35,7 @@ logger = hivemind.get_logger(__file__)
 INFERENCE_PATH = {} #manager.dict()
 GLOBAL_MAP = {}
 GLOBAL_NAME = ""
-GLOBAL_REFERENCES = []
 lock = threading.Lock()
-lock1 = threading.Lock()
 isDummyRunning = False
 
 def run_dummy_session(model,tokenizer,name):
@@ -72,7 +70,6 @@ def run_dummy_session(model,tokenizer,name):
 
 @sock.route("/api/v2/generate")
 def ws_api_generate(ws):
-    #global GLOBAL_REFERENCES
     try:
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session" #"generate"   
@@ -190,26 +187,11 @@ def ws_api_generate(ws):
             return_source_documents=False,
             chain_type_kwargs={"prompt": prompt}#, "memory": memory},
         )
-
-        def get_references(message):
-            global GLOBAL_REFERENCES
-            with lock1:
-                GLOBAL_REFERENCES = []
-                # Retrieve context documents
-                retrieved_docs = retriever.get_relevant_documents(message)
-                GLOBAL_REFERENCES = [doc.metadata["source"] for doc in retrieved_docs]
-                logger.info(f"reference list 1 = {GLOBAL_REFERENCES}")
-                logger.info(f"reference raw docs = {retrieved_docs}")
         def run_enhanced_rqa(message):
             qa.run(message)
-            
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
-        #t1 = threading.Thread(target=get_references, args=(UserInput,))
-        #t1.start()
-        #t1.join()
         t.start()
-        logger.info(f"reference list = {GLOBAL_REFERENCES}")
 
         max_token = 1024
         index = 0 
@@ -218,51 +200,34 @@ def ws_api_generate(ws):
         while True:
             for outputs in streamer:
                 sequence +=outputs
-                '''
-                if config.STOP_TOKEN in sequence:
-                    stop = True
-                    sequence = sequence.replace(config.STOP_TOKEN, "").strip()  # Clean up the stop character
-                    #break
-                '''
                 if ((sequence.find("\n\n\n\n")!=-1) or ( (len(sequence)>5) and (sequence.isspace()))):
                     stop = True
                     index = 0
-                #global GLOBAL_MAP
+                
                 token_count = 0
                 route_json = {}
-                references_json = []
-                #time.sleep(0.05)
+                
                 with lock:
                     route_json = json.dumps(GLOBAL_MAP)
-                    references_json = json.dumps(GLOBAL_REFERENCES)
-                #HIVE END
+                
                 token_count = len(outputs.split())
                 stop_sequence = request.get("stop_sequence")
                 if ((outputs.endswith(stop_sequence)) or (outputs.endswith("\n\n\n\n")) or (index >= max_token)):
                     stop = True
-                #    index = 0
-                    #outputs = ""
-                    #token_count = 0 
-                #if ((outputs.endswith("-----")) or (outputs.find("-----")!=-1)):
-                #    stop = True
-                    #outputs = ""
-                    #token_count = 0
+               
                 if ((outputs.endswith("Question")) or (outputs.find("Question")!=-1)):
                     stop = True
                     index = 0
                     outputs = ""
-                #if outputs == "":
-                #    stop = True
+                
                 if index >= max_token:
                     stop = True
-                    #outputs = ""
-                    #token_count = 0
-                #if index > nm_tokens-1: #(n_input_tokens-5):
+                  
                 if stop and outputs.isspace():
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
-                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json}))#,"references":references_json}))
-                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json}))#, "references":references_json}))
+                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json}))
+                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json}))
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
@@ -273,12 +238,11 @@ def ws_api_generate(ws):
             if stop:
                 index = 0
                 break
-            #outputs = [text]
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
-        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1}))#, "route":json.dumps(GLOBAL_MAP)}))
+        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP)}))
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
