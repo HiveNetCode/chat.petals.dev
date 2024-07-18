@@ -205,9 +205,9 @@ def ws_api_generate(ws):
             
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
-        t1 = threading.Thread(target=get_references, args=(UserInput,))
-        t1.start()
-        t1.join()
+        #t1 = threading.Thread(target=get_references, args=(UserInput,))
+        #t1.start()
+        #t1.join()
         t.start()
         logger.info(f"reference list = {GLOBAL_REFERENCES}")
 
