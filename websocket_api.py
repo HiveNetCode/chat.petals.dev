@@ -178,7 +178,7 @@ def ws_api_generate(ws):
 
         Question: {question}
         Answer:
-        ###"""
+        """
 
         prompt = PromptTemplate(input_variables=["context", "question"], template=template)
         memory = ConversationBufferMemory(input_key="question", memory_key="history")
