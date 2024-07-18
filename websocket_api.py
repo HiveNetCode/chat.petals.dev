@@ -172,7 +172,7 @@ def ws_api_generate(ws):
 
         Your goal is to provide answers based only on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
         the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot guess the answer from the provided contexts or if the context is empty,
-        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
+        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of all meta data tags or characters except for the stop sequence.
 
         {context}
 
@@ -218,10 +218,12 @@ def ws_api_generate(ws):
         while True:
             for outputs in streamer:
                 sequence +=outputs
+                '''
                 if config.STOP_TOKEN in sequence:
                     stop = True
                     sequence = sequence.replace(config.STOP_TOKEN, "").strip()  # Clean up the stop character
                     #break
+                '''
                 if ((sequence.find("\n\n\n\n")!=-1) or ( (len(sequence)>5) and (sequence.isspace()))):
                     stop = True
                     index = 0
@@ -259,8 +261,8 @@ def ws_api_generate(ws):
                 if stop and outputs.isspace():
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
-                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "references":references_json}))
-                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "references":references_json}))
+                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json}))#,"references":references_json}))
+                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json}))#, "references":references_json}))
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
@@ -276,7 +278,7 @@ def ws_api_generate(ws):
         pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
-        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "references":json.dumps(GLOBAL_REFERENCES)}))
+        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1}))#, "route":json.dumps(GLOBAL_MAP)}))
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
