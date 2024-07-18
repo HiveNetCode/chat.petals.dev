@@ -38,7 +38,7 @@ GLOBAL_NAME = ""
 lock = threading.Lock()
 isDummyRunning = False
 
-from langchain.callbacks import CallbackManager, BaseCallbackHandler
+from langchain.callbacks import BaseCallbackHandler
 
 class StoreDocumentsCallback(BaseCallbackHandler):
     def __init__(self):
@@ -192,14 +192,15 @@ def ws_api_generate(ws):
         memory = ConversationBufferMemory(input_key="question", memory_key="history")
         
         callback = StoreDocumentsCallback()
-        callback_manager = CallbackManager([callback])
+        #callback_manager = CallbackManager([callback])
         qa = RetrievalQA.from_chain_type(
             llm=local_llm, #model,
             chain_type="stuff",
             retriever=retriever, #reduce_k_below_max_tokens=True,
             return_source_documents=False,
             chain_type_kwargs={"prompt": prompt},#, "memory": memory},
-            callback_manager=callback_manager
+            callbacks=[callback] 
+            #callback_manager=callback_manager
         )
         def run_enhanced_rqa(message):
             qa.run(message)
