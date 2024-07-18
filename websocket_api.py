@@ -38,6 +38,18 @@ GLOBAL_NAME = ""
 lock = threading.Lock()
 isDummyRunning = False
 
+from langchain.callbacks import CallbackManager, BaseCallbackHandler
+
+class StoreDocumentsCallback(BaseCallbackHandler):
+    def __init__(self):
+        super().__init__()
+        self.source_documents = []
+
+    def on_retriever_end(self, documents, **kwargs):
+        self.source_documents.extend(documents)
+        logger.info(f"HIVE: CALLBACK SRC_DOCS: {self.source_documents}")
+            
+
 def run_dummy_session(model,tokenizer,name):
     
     global GLOBAL_MAP
@@ -160,20 +172,6 @@ def ws_api_generate(ws):
         #callbacks.append().on_llm_new_token()
         retriever = db.as_retriever(search_kwargs={'k': 3})
         # Create a system prompt 
-        '''
-        template = """<s>[INST] <<SYS>>
-        You are a helpful, respectful and honest assistant. Always answer as 
-        helpfully as possible, while being safe. Your answers should not include
-        any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content.
-        Please ensure that your responses are socially unbiased and positive in nature.
-
-        If a question does not make any sense, or is not factually coherent, explain 
-        why instead of answering something not correct. If you don't know the answer 
-        to a question, please don't share false information.
-
-        Your goal is to provide answers based on the pieces of context retrieved from the company knowledge database.<</SYS>>
-        """
-        '''
         template = """You are a helpful, respectful and honest assistant. Always answer as 
         helpfully as possible, while being safe.
         Please ensure that your responses are socially unbiased and positive in nature.
@@ -192,13 +190,16 @@ def ws_api_generate(ws):
 
         prompt = PromptTemplate(input_variables=["context", "question"], template=template)
         memory = ConversationBufferMemory(input_key="question", memory_key="history")
-
+        
+        callback = StoreDocumentsCallback()
+        callback_manager = CallbackManager([callback])
         qa = RetrievalQA.from_chain_type(
             llm=local_llm, #model,
             chain_type="stuff",
             retriever=retriever, #reduce_k_below_max_tokens=True,
             return_source_documents=False,
-            chain_type_kwargs={"prompt": prompt}#, "memory": memory},
+            chain_type_kwargs={"prompt": prompt},#, "memory": memory},
+            callback_manager=callback_manager
         )
         def run_enhanced_rqa(message):
             qa.run(message)
@@ -227,29 +228,19 @@ def ws_api_generate(ws):
                 stop_sequence = request.get("stop_sequence")
                 if ((outputs.endswith(stop_sequence)) or (outputs.endswith("\n\n\n\n")) or (index >= max_token)):
                     stop = True
-                #    index = 0
-                    #outputs = ""
-                    #token_count = 0 
-                #if ((outputs.endswith("-----")) or (outputs.find("-----")!=-1)):
-                #    stop = True
-                    #outputs = ""
-                    #token_count = 0
                 if ((outputs.endswith("Question")) or (outputs.find("Question")!=-1)):
                     stop = True
                     index = 0
                     outputs = ""
-                #if outputs == "":
-                #    stop = True
+    
                 if index >= max_token:
                     stop = True
-                    #outputs = ""
-                    #token_count = 0
-                #if index > nm_tokens-1: #(n_input_tokens-5):
+                  
                 if stop and outputs.isspace():
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
-                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json}))
-                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json}))
+                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "source_documents": callback.source_documents}))
+                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": callback.source_documents}))
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
@@ -260,117 +251,11 @@ def ws_api_generate(ws):
             if stop:
                 index = 0
                 break
-            #outputs = [text]
-            '''
-                res = qa(UserInput)#qa(inputs)
-                answer, docs = res["result"], []
-                topAnswer = answer.split("\n")[0]
-                combined = repr(answer)
-                stop = True
-                #stop = stop_sequence is None or combined.endswith(stop_sequence)
-                #if extra_stop_sequences is not None:
-                #    for seq in extra_stop_sequences:
-                #        if combined.endswith(seq):
-                #            stop = True
-                if stop:
-                    logger.info(f"ws.generate.step(), all_outputs={answer}, stop={stop}")
-                    token_count = len(combined.split())
-                    # Use regular expressions to remove lines starting with 'Question' or 'Answer'
-                    clean_answer = re.sub(r'^\s*(Question:|Answer:|Question|Answer).*$', '', answer, flags=re.MULTILINE)
-                    #print(text_without_questions_and_answers)
-                    global GLOBAL_MAP
-                    #token_count = 0
-                    route_json = {}
-                    with lock:
-                        route_json = json.dumps(GLOBAL_MAP)
-                    
-                    logger.info(f"ROUTE: DummyPath via: {route_json}")
-                    #logger.info(f"CALLBACK CONTENT: {callbacks.pop()}")
-                    ws.send(json.dumps({"ok": True, "outputs": clean_answer.strip(), "stop": stop, "token_count": token_count,"route":route_json}))
-        
-        with model.inference_session(max_length=request["max_length"]) as session:
-            ws.send(json.dumps({"ok": True}))
-            inputs = request.get("inputs")
-            if inputs is not None:
-                logger.info(f"ws.generate.step(), inputs={repr(inputs)}")
-                res = qa(inputs)
-                answer, docs = res["result"], []
-                stop = True
-                logger.info(f"ws.generate.step(), all_outputs={repr(answer)}, stop={stop}")
-                ws.send(json.dumps({"ok": True, "outputs": answer, "stop": stop, "token_count": 0}))
-        '''
-        
-        '''
-            while True:
-                request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
-                assert request["type"] == "generate"
-                inputs = request.get("inputs")
-                logger.info(f"ws.generate.step(), inputs={repr(inputs)}")
-                
-                if inputs is not None:
-                    inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)
-                    n_input_tokens = inputs.shape[1]
-                else:
-                    n_input_tokens = 0
-                
-
-                stop_sequence = request.get("stop_sequence")
-                extra_stop_sequences = request.get("extra_stop_sequences")
-                #if extra_stop_sequences is not None:
-                    #cont_token = tokenizer(stop_sequence, return_tensors="pt")["input_ids"].to(config.DEVICE)
-                    #assert cont_token.shape == (1, 1), \
-                    #    "extra_stop_sequences require stop_sequence length to be exactly 1 token"
-
-                all_outputs = ''
-                delta_q = []
-                stop = False
-                if not stop:
-                    res = qa(inputs)
-                    
-                    outputs = model.generate(
-                        inputs=inputs,
-                        do_sample=request.get("do_sample", False),
-                        temperature=request.get("temperature"),
-                        top_k=request.get("top_k"),
-                        top_p=request.get("top_p"),
-                        repetition_penalty=request.get("repetition_penalty"),
-                        max_length=request.get("max_length"),
-                        max_new_tokens=request.get("max_new_tokens"),
-                        session=session,
-                    )
-                    
-                    answer, docs = res["result"], []
-                    #delta = answer[0, n_input_tokens:].tolist()
-                    #outputs = safe_decode(tokenizer, delta_q + delta)
-                    inputs = None  # Inputs are passed only for the 1st token of the bot's response
-                    n_input_tokens = 0
-                    combined = all_outputs + answer #outputs
-                    #stop = stop_sequence is None or combined.endswith(stop_sequence)
-                    stop = True
-                    
-                    if extra_stop_sequences is not None:
-                        for seq in extra_stop_sequences:
-                            if combined.endswith(seq):
-                                stop = True
-                                session.last_token_id = cont_token
-                    
-                    if not stop:
-                        # If there's a replacement character, keep getting more tokens
-                        # until we can decode properly
-                        #delta_q = delta_q + delta
-                        logger.info(f"ws.generate.append_retry(), all_outputs={repr(combined)}")
-                    else:
-                        all_outputs = combined
-                        #token_count = len(delta_q + delta)
-                        #delta_q = []
-                        logger.info(f"ws.generate.step(), all_outputs={repr(all_outputs)}, stop={stop}")
-                        ws.send(json.dumps({"ok": True, "outputs": answer, "stop": stop, "token_count": 0}))
-                        '''
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
-        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP)}))
+        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "source_documents": callback.source_documents}))
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
