@@ -43,13 +43,12 @@ from langchain_core.callbacks import BaseCallbackHandler
 class StoreDocumentsCallback(BaseCallbackHandler):
     def __init__(self):
         super().__init__()
-        self.source_documents = []
-        self.references = []
+        self.source_documents = {}
 
     def on_retriever_end(self, documents, **kwargs):
-        self.source_documents.extend(documents)
-        if len(self.source_documents) > 0:
-            self.references = [doc.metadata['source'] for doc in self.source_documents]
+        #self.source_documents.extend(documents)
+        for doc in documents:
+            self.source_documents[doc.metadata['source']] = doc.page_content
         logger.info(f"HIVE: CALLBACK SRC_DOCS: {self.source_documents}")
             
 
@@ -224,6 +223,8 @@ def ws_api_generate(ws):
                 #global GLOBAL_MAP
                 token_count = 0
                 route_json = {}
+                source_json = {}
+                source_json = json.dumps(callback.source_documents)
                 #time.sleep(0.05)
                 with lock:
                     route_json = json.dumps(GLOBAL_MAP)
@@ -243,8 +244,8 @@ def ws_api_generate(ws):
                 if stop and outputs.isspace():
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
-                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "source_documents": callback.references}))
-                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": callback.references}))
+                    ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "source_documents": source_json}))
+                ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": source_json}))
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
@@ -259,7 +260,7 @@ def ws_api_generate(ws):
         pass
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
-        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "source_documents": callback.references}))
+        ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "source_documents": source_json}))
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
