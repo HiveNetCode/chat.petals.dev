@@ -198,12 +198,12 @@ def ws_api_generate(ws):
             chain_type="stuff",
             retriever=retriever, #reduce_k_below_max_tokens=True,
             return_source_documents=False,
-            chain_type_kwargs={"prompt": prompt},#, "memory": memory},
-            callbacks=[callback] 
+            chain_type_kwargs={"prompt": prompt}#,#, "memory": memory},
+            #callbacks=[callback] 
             #callback_manager=callback_manager
         )
         def run_enhanced_rqa(message):
-            qa.run(message)
+            qa.run(message,callbacks=[callback])
 
         t = threading.Thread(target=run_enhanced_rqa, args=(UserInput,))
         t.start()
