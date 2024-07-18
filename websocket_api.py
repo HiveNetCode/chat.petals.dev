@@ -38,7 +38,7 @@ GLOBAL_NAME = ""
 lock = threading.Lock()
 isDummyRunning = False
 
-from langchain.callbacks import BaseCallbackHandler
+from langchain_core.callbacks import BaseCallbackHandler
 
 class StoreDocumentsCallback(BaseCallbackHandler):
     def __init__(self):
