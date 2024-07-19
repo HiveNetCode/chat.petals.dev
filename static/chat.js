@@ -253,11 +253,12 @@ function receiveReplica(inputs) {
         });
 
         const jsonDocObj = JSON.parse(sourceDocs);
-        const sourceDocContainer = $("<ul class='source-doc-container'>");
+
+        const sourceDocContainer = $('<ul>');
         $.each(jsonDocObj, function(filename, content) {
-            const docItem = $(`<li class="source-doc" data-filename="${filename}"><span class="doc-icon">📄</span> ${filename}</li>`);
+            const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`) //$(`<li><span class="doc-icon">📄</span> ${filename}</li>`);
             const docContent = $(`<div class="source-doc-content">${content}</div>`);
-            docItem.append(docContent);
+            //docItem.append(docContent);
             sourceDocContainer.append(docItem);
         });
 
@@ -287,11 +288,11 @@ function receiveReplica(inputs) {
                 });
 
                 const jsonDocObj = JSON.parse(sourceDocs);
-                const sourceDocContainer = $('<ul class="source-doc-container">');
+                const sourceDocContainer = $('<ul>');
                 $.each(jsonDocObj, function(filename, content) {
-                    const docItem = $(`<li class="source-doc" data-filename="${filename}"><span class="doc-icon">📄</span> ${filename}</li>`);
+                    const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`) //$(`<li><span class="doc-icon">📄</span> ${filename}</li>`);
                     const docContent = $(`<div class="source-doc-content">${content}</div>`);
-                    docItem.append(docContent);
+                    //docItem.append(docContent);
                     sourceDocContainer.append(docItem);
                 });
 
