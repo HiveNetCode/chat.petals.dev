@@ -260,14 +260,17 @@ function receiveReplica(inputs) {
 
         //const docUL = $('<div>')
         const jsonDocObj = JSON.parse(sourceDocs);
-        const sourceDocContainer = $("<div class='source-docs>'");
+        const sourceDocContainer = $("<div class='source-docs'>");
         $.each(jsonDocObj, function(filename, content) {
             const docItem = $(`<div class="source-doc" data-filename="${filename}">${filename}</div>`);
             const docContent = $(`<div class="source-doc-content">${content}</div>`);
             docItem.append(docContent);
             sourceDocContainer.append(docItem);
         });
-
+        // Toggle source document content visibility
+        $('.source-doc').click(function() {
+            $(this).find('.source-doc-content').toggle();
+        });
 
         // Show the parsed data and list with bullets in your HTML elements
         const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`)
@@ -299,12 +302,16 @@ function receiveReplica(inputs) {
                 });
 
                 const jsonDocObj = JSON.parse(sourceDocs);
-                const sourceDocContainer = $("<div class='source-docs>'");
+                const sourceDocContainer = $("<div class='source-docs'>");
                 $.each(jsonDocObj, function(filename, content) {
                     const docItem = $(`<div class="source-doc" data-filename="${filename}">${filename}</div>`);
                     const docContent = $(`<div class="source-doc-content">${content}</div>`);
                     docItem.append(docContent);
                     sourceDocContainer.append(docItem);
+                });
+                // Toggle source document content visibility
+                $('.source-doc').click(function() {
+                    $(this).find('.source-doc-content').toggle();
                 });
 
                 // Show the parsed data and list with bullets in your HTML elements

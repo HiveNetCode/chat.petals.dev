@@ -245,10 +245,13 @@ def ws_api_generate(ws):
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
                     ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "source_documents": source_json}))
+                    logger.info(f"source_docs = {source_json}")
                 ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": source_json}))
+                logger.info(f"source_docs = {source_json}")
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
+                logger.info(f"source_docs = {source_json}")
 
                 if stop:
                     index = 0
@@ -261,6 +264,7 @@ def ws_api_generate(ws):
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
         ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "source_documents": source_json}))
+        logger.info(f"source_docs = {source_json}")
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
