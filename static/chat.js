@@ -196,7 +196,6 @@ function displayResponseTime(time) {
 }
 
 function receiveReplica(inputs) {
-    // Add this line to record the start time
     const requestStartTime = performance.now();
 
     ws.send(JSON.stringify({
@@ -210,7 +209,7 @@ function receiveReplica(inputs) {
 
     var lastMessageTime = null;
     ws.onmessage = event => {
-        connFailureBefore = false; // We've managed to connect after a possible failure
+        connFailureBefore = false;
 
         const response = JSON.parse(event.data);
         if (!response.ok) {
@@ -218,13 +217,11 @@ function receiveReplica(inputs) {
             return;
         }
 
-        // Calculate the response time
         const responseTime = performance.now() - requestStartTime;
         const elapsedSec = responseTime / 1000;
         $('.elapsed')
             .text(`Elapsed: ${elapsedSec.toFixed(1)} sec`)
             .show();
-
 
         if (lastMessageTime != null) {
             totalElapsed += performance.now() - lastMessageTime;
@@ -251,34 +248,27 @@ function receiveReplica(inputs) {
 
         // Iterate through the object's properties
         $.each(jsonObj, function(key, value) {
-            // Create list items with bullets
             const li = $('<li>').html(`Blocks<strong> [${key}]:</strong> via <strong>${value}</strong>`);
-
-            // Append list items to the unordered list
             ul.append(li);
         });
 
-        //const docUL = $('<div>')
         const jsonDocObj = JSON.parse(sourceDocs);
-        const sourceDocContainer = $("<div class='source-docs'>");
+        const sourceDocContainer = $("<ul class='source-doc-container'>");
         $.each(jsonDocObj, function(filename, content) {
-            const docItem = $(`<div class="source-doc" data-filename="${filename}">${filename}</div>`);
+            const docItem = $(`<li class="source-doc" data-filename="${filename}"><span class="doc-icon">📄</span> ${filename}</li>`);
             const docContent = $(`<div class="source-doc-content">${content}</div>`);
             docItem.append(docContent);
             sourceDocContainer.append(docItem);
         });
-        // Toggle source document content visibility
+
         $('.source-doc').click(function() {
             $(this).find('.source-doc-content').toggle();
         });
 
-        // Show the parsed data and list with bullets in your HTML elements
-        const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`)
-            //$('.route-message').html(ul).show();
-            //$('.route-message').text(routeMap).show();
+        const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
         routeInfo.find('.route-message').append(ul);
-        routeInfo.find('docs-message').append(sourceDocContainer)
-            //$('.route-box').html(routeInfo).show();
+        routeInfo.find('.docs-message').append(sourceDocContainer);
+        $('.route-box').html(routeInfo).show();
 
         if (!response.stop && !forceStop) {
             if (tokenCount >= 1) {
@@ -289,43 +279,35 @@ function receiveReplica(inputs) {
                     .show();
 
                 const jsonObj = JSON.parse(routeMap);
-                // Create an unordered list
                 const ul = $('<ul>');
 
-                // Iterate through the object's properties
                 $.each(jsonObj, function(key, value) {
-                    // Create list items with bullets
                     const li = $('<li>').html(`Blocks<strong> [${key}]:</strong> via <strong>${value}</strong>`);
-
-                    // Append list items to the unordered list
                     ul.append(li);
                 });
 
                 const jsonDocObj = JSON.parse(sourceDocs);
-                const sourceDocContainer = $("<div class='source-docs'>");
+                const sourceDocContainer = $('<ul class="source-doc-container">');
                 $.each(jsonDocObj, function(filename, content) {
-                    const docItem = $(`<div class="source-doc" data-filename="${filename}">${filename}</div>`);
+                    const docItem = $(`<li class="source-doc" data-filename="${filename}"><span class="doc-icon">📄</span> ${filename}</li>`);
                     const docContent = $(`<div class="source-doc-content">${content}</div>`);
                     docItem.append(docContent);
                     sourceDocContainer.append(docItem);
                 });
-                // Toggle source document content visibility
+
                 $('.source-doc').click(function() {
                     $(this).find('.source-doc-content').toggle();
                 });
 
-                // Show the parsed data and list with bullets in your HTML elements
-                const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`)
-                    //$('.route-message').html(ul).show();
-                    //$('.route-message').text(routeMap).show();
+                const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
                 routeInfo.find('.route-message').append(ul);
-                routeInfo.find('docs-message').append(sourceDocContainer);
+                routeInfo.find('.docs-message').append(sourceDocContainer);
                 $('.route-box').html(routeInfo).show();
-
 
                 $('.elapsed')
                     .text(`Elapsed: ${elapsedSec.toFixed(1)} sec`)
                     .show();
+
                 if (speed < 1) {
                     $('.suggest-join').show();
                 }
@@ -335,18 +317,8 @@ function receiveReplica(inputs) {
                 resetSession();
                 forceStop = false;
             }
-            //if (tokenCount >= 1) {
-            //const speed = tokenCount / (totalElapsed / 1000);
-
-            //if (speed < 1) {
-            //  $('.suggest-join').show();
-            // }
-            //}
-            //$('.loading-animation, .speed, .suggest-join, .generation-controls').remove();
-            $('.loading-animation, .speed, .generation-controls, .suggest-join').remove()
-
+            $('.loading-animation, .speed, .generation-controls, .suggest-join').remove();
             appendTextArea();
-
         }
     };
 }

@@ -394,7 +394,8 @@ main p {
     /*float: right;*/
 }
 
-.source-docs {
+.source-doc-container {
+    margin-top: 20px;
     list-style-type: none;
     padding-left: 0;
 }
@@ -402,6 +403,14 @@ main p {
 .source-doc {
     cursor: pointer;
     margin: 5px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.source-doc .doc-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 .source-doc-content {
