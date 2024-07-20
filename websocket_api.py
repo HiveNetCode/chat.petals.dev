@@ -48,7 +48,7 @@ class StoreDocumentsCallback(BaseCallbackHandler):
     def on_retriever_end(self, documents, **kwargs):
         #self.source_documents.extend(documents)
         for doc in documents:
-            self.source_documents[doc.metadata['source']] = doc.page_content
+            self.source_documents[os.path.basename(doc.metadata['source'])] = doc.page_content
         logger.info(f"HIVE: CALLBACK SRC_DOCS: {self.source_documents}")
             
 
@@ -177,13 +177,13 @@ def ws_api_generate(ws):
         template = """You are a helpful, respectful and honest assistant. Always answer as 
         helpfully as possible, while being safe.
         Please ensure that your responses are socially unbiased and positive in nature.
-
+        
         If a question does not make any sense, or is not factually coherent, explain 
-        why instead of answering something not correct. If you don't know the answer 
-        to a question, please don't share false information.
+        why instead of answering something not correct. If you cannot answer a question based on the provided context, please don't share false information.
 
-        Your goal is to provide answers based only on the pieces of context you receive from the company private knowledge database. If you cannot guess the answer from the provided contexts or if the context is empty,
+        Provide answers based solely on the following pieces of context below retreived from the company private knowledge database. If you cannot guess the answer from the provided contexts or if the context is empty,
         please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
+        
 
         {context}
 
@@ -245,13 +245,13 @@ def ws_api_generate(ws):
                     outputs = "Sorry, I would need to learn more.\n"
                     token_count = 12
                     ws.send(json.dumps({"ok": True, "outputs": "Sorry, I would need to learn more.\n", "stop": True, "token_count": 12, "route":route_json, "source_documents": source_json}))
-                    logger.info(f"source_docs = {source_json}")
+                    #logger.info(f"source_docs = {source_json}")
                 ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": source_json}))
                 logger.info(f"source_docs = {source_json}")
                 incr = len(outputs.split())
                 index+=incr
                 logger.info(f"HIVE Incr Ouptput = {outputs}")
-                logger.info(f"source_docs = {source_json}")
+                #logger.info(f"source_docs = {source_json}")
 
                 if stop:
                     index = 0
@@ -264,7 +264,7 @@ def ws_api_generate(ws):
     except Exception:
         logger.warning("ws.generate failed:", exc_info=True)
         ws.send(json.dumps({"ok": True, "outputs": "\n", "stop": True, "token_count": 1, "route":json.dumps(GLOBAL_MAP), "source_documents": source_json}))
-        logger.info(f"source_docs = {source_json}")
+        #logger.info(f"source_docs = {source_json}")
         #ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")

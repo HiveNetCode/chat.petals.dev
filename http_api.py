@@ -263,7 +263,10 @@ def load_single_document(file_path: str) -> Document:
     loader_class = DOCUMENT_MAP.get(file_extension)
     if loader_class:
         try:
-            loader = loader_class(file_path)
+            if file_extension == ".txt" or file_extension == ".clean":
+                loader = loader_class(file_path,autodetect_encoding=True)
+            else:
+                loader = loader_class(file_path)
         except Exception as e:
             logger.warning(f"ignoring a malformed file, filename: {file_path}, err: {e}")
             raise(e)

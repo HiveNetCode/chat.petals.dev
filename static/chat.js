@@ -256,14 +256,28 @@ function receiveReplica(inputs) {
 
         const sourceDocContainer = $('<ul>');
         $.each(jsonDocObj, function(filename, content) {
-            const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`) //$(`<li><span class="doc-icon">📄</span> ${filename}</li>`);
-            const docContent = $(`<div class="source-doc-content">${content}</div>`);
-            //docItem.append(docContent);
-            sourceDocContainer.append(docItem);
-        });
+            const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`);
+            const docContent = $(`<div class="source-doc-content">${content}</div>`).hide(); // Hide the content by default
 
-        $('.source-doc').click(function() {
-            $(this).find('.source-doc-content').toggle();
+            // Append the content div to the docItem
+            docItem.append(docContent);
+
+            // Add hover event to show content
+            docItem.hover(
+                function() {
+                    docContent.show(); // Show content on hover
+                },
+                function() {
+                    docContent.hide(); // Hide content when not hovering
+                }
+            );
+
+            // Add click event to toggle content
+            docItem.click(function() {
+                docContent.toggle(); // Toggle content on click
+            });
+
+            sourceDocContainer.append(docItem);
         });
 
         const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
@@ -290,15 +304,30 @@ function receiveReplica(inputs) {
                 const jsonDocObj = JSON.parse(sourceDocs);
                 const sourceDocContainer = $('<ul>');
                 $.each(jsonDocObj, function(filename, content) {
-                    const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`) //$(`<li><span class="doc-icon">📄</span> ${filename}</li>`);
-                    const docContent = $(`<div class="source-doc-content">${content}</div>`);
-                    //docItem.append(docContent);
+                    const docItem = $('<li>').html(`<span class="doc-icon">📄</span> <strong> ${filename}</strong>`);
+                    const docContent = $(`<div class="source-doc-content">${content}</div>`).hide(); // Hide the content by default
+
+                    // Append the content div to the docItem
+                    docItem.append(docContent);
+
+                    // Add hover event to show content
+                    docItem.hover(
+                        function() {
+                            docContent.show(); // Show content on hover
+                        },
+                        function() {
+                            docContent.hide(); // Hide content when not hovering
+                        }
+                    );
+
+                    // Add click event to toggle content
+                    docItem.click(function() {
+                        docContent.toggle(); // Toggle content on click
+                    });
+
                     sourceDocContainer.append(docItem);
                 });
 
-                $('.source-doc').click(function() {
-                    $(this).find('.source-doc-content').toggle();
-                });
 
                 const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
                 routeInfo.find('.route-message').append(ul);
