@@ -47,8 +47,17 @@ class StoreDocumentsCallback(BaseCallbackHandler):
 
     def on_retriever_end(self, documents, **kwargs):
         #self.source_documents.extend(documents)
+        temp ={}
         for doc in documents:
-            self.source_documents[os.path.basename(doc.metadata['source'])] = doc.page_content
+            filename = os.path.basename(doc.metadata['source'])
+            if  self.source_documents.get(filename) is not None:
+                temp[filename] = temp[filename] +1
+                self.source_documents[filename + " (" + str(temp[filename]) + ")"] = doc.page_content
+            else:
+               temp[filename] = 0
+               self.source_documents[filename] = doc.page_content 
+                
+            #self.source_documents[os.path.basename(doc.metadata['source'])] = doc.page_content
         logger.info(f"HIVE: CALLBACK SRC_DOCS: {self.source_documents}")
             
 
@@ -176,12 +185,13 @@ def ws_api_generate(ws):
         # Create a system prompt 
         template = """You are a helpful, respectful and honest assistant. Always answer as 
         helpfully as possible, while being safe.
-        Please ensure that your responses are socially unbiased and positive in nature.
-        
-        If a question does not make any sense, or is not factually coherent, explain 
-        why instead of answering something not correct. If you cannot answer a question based on the provided context, please don't share false information.
 
-        Provide answers based solely on the following pieces of context below retreived from the company private knowledge database. If you cannot guess the answer from the provided contexts or if the context is empty,
+        If a question does not make any sense, or is not factually coherent, explain 
+        why instead of answering something not correct. If you don't know the answer 
+        to a question, please don't share false information.
+
+        Your goal is to provide answers based only on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
+        the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot guess the answer from the provided contexts or if the context is empty,
         please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
         
 
