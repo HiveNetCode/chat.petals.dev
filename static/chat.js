@@ -34,7 +34,7 @@ const models = {
     "meta-llama/Llama-2-70b-chat-hf": {
         modelCard: "https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
         license: "https://bit.ly/llama2-license",
-        maxSessionLength: 8192,
+        maxSessionLength: 4096,
         sepToken: "###",
         stopToken: "###",
         extraStopSequences: ["</s>"],
