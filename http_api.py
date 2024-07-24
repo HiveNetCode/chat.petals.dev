@@ -83,7 +83,7 @@ def update_from_kaggle():
     logger.info(f"Loading Kaggle documents from {config.SOURCE_DIRECTORY}")
     documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=20)
     python_splitter = RecursiveCharacterTextSplitter.from_language(
         language=Language.PYTHON, chunk_size=412, chunk_overlap=50
     )
