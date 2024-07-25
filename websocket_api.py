@@ -167,7 +167,7 @@ def ws_api_generate(ws):
         do_sample=False,
         streamer=streamer,
         #use_cache=False,
-        device=torch.device('cuda') #config.DEVICE #"cuda:0"
+        device=config.DEVICE #config.DEVICE #"cuda:0"
         )
         #pipe.streamer = streamer
         #local_llm = HuggingFacePipeline(pipeline=pipe,callbacks=callbacks)

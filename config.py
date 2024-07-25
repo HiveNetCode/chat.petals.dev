@@ -43,12 +43,17 @@ PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
 #INITIAL_PEERS = ['/ip4/51.79.102.103/tcp/31337/p2p/QmT3TtHZyKGHuXzgWaC5AXscQsFRrH9jJGU8PC4YJUwD5g']
 INITIAL_PEERS = []
 BOOTSTRAP_PEERS = os.environ['INITIAL_PEERS']
+DEVICE = "cuda" #if torch.cuda.is_available() else "cpu"
+GPU_INDEX =  os.environ['DEVICE']
+if GPU_INDEX != "":
+    DEVICE = GPU_INDEX
+    
 if BOOTSTRAP_PEERS != "":
     bootstrap_list = BOOTSTRAP_PEERS.split(",")
     for peer in bootstrap_list:
         if peer != "":
             INITIAL_PEERS.append(BOOTSTRAP_PEERS)
-DEVICE = "cuda" #if torch.cuda.is_available() else "cpu"
+
 
 try:
     from cpufeature import CPUFeature
@@ -56,7 +61,7 @@ try:
 except ImportError:
     has_avx512 = False
 
-if DEVICE == "cuda":
+if DEVICE.startswith("cuda"):
     TORCH_DTYPE = "auto"
 elif has_avx512:
     TORCH_DTYPE = torch.bfloat16

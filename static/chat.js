@@ -280,7 +280,7 @@ function receiveReplica(inputs) {
             sourceDocContainer.append(docItem);
         });
 
-        const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
+        const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents --&gt </strong><br><span class="docs-message"></span>`);
         routeInfo.find('.route-message').append(ul);
         routeInfo.find('.docs-message').append(sourceDocContainer);
         $('.route-box').html(routeInfo).show();
@@ -329,7 +329,7 @@ function receiveReplica(inputs) {
                 });
 
 
-                const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents</strong><br><span class="docs-message"></span>`);
+                const routeInfo = $('<div>').html(`<i class="fas fa-info-circle"></i> <strong>Found Inference Path --&gt </strong><br><span class="route-message"></span><br> <i class="fas fa-book"></i> <strong>Source Documents --&gt </strong><br><span class="docs-message"></span>`);
                 routeInfo.find('.route-message').append(ul);
                 routeInfo.find('.docs-message').append(sourceDocContainer);
                 $('.route-box').html(routeInfo).show();
