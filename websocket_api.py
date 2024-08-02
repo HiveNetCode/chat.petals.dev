@@ -93,6 +93,7 @@ def run_dummy_session(model,tokenizer,name):
 
 @sock.route("/api/v2/generate")
 def ws_api_generate(ws):
+    source_json = {}
     try:
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session" #"generate"   
@@ -154,7 +155,7 @@ def ws_api_generate(ws):
             "n_threads": psutil.cpu_count(logical=False),
             "max_tokens": max_ctx_size
         }
-        streamer = TextIteratorStreamer(tokenizer, timeout=10., skip_prompt=True, skip_special_tokens=True)
+        streamer = TextIteratorStreamer(tokenizer, timeout=30., skip_prompt=True, skip_special_tokens=True)
         pipe = pipeline(
         "text-generation",
         model=model,
@@ -224,6 +225,7 @@ def ws_api_generate(ws):
         index = 0 
         stop = False
         sequence = ""
+        source_json = {}
         while True:
             for outputs in streamer:
                 sequence +=outputs

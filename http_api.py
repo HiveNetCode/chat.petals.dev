@@ -56,8 +56,19 @@ import torch
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 from langchain.prompts import ChatPromptTemplate
 
+from ragas import evaluate
+from datasets import Dataset
+from ragas.metrics.critique import harmfulness
+from langchain_community.vectorstores import Chroma
+from langchain_experimental.text_splitter import SemanticChunker
+from langchain_community.document_loaders import SeleniumURLLoader
+from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall, context_entity_recall, answer_similarity, answer_correctness
+
 #Houssam
 import hivedisk_api
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 
 #ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 # Define the folder for storing database
@@ -109,6 +120,105 @@ def update_from_kaggle():
     logger.info(f"Knowledge DB Updated with Kaggle Dataset !!")
     return "OK"
     
+@app.post("/api/v1/evaluate")
+def evaluate_rag_with_kaggle_dataset():
+    # Initialize the Kaggle API
+    kaggleApi = KaggleApi()
+    kaggleApi.authenticate()
+    logger.info(f"kaggle authentication OK")
+    logger.info(f"Evaluating hiveChat RAG setup with Kaggle dataset...")
+    df_08 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S08_question_answer_pairs.txt"), sep='\t')
+    df_09 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S09_question_answer_pairs.txt"), sep='\t')
+    df_10 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S10_question_answer_pairs.txt"), sep='\t', encoding = 'ISO-8859-1')
+    df_all = df_08.append([df_09, df_10])
+    df_all_1 = df_all[['Question', 'Answer']]
+    queries = df_all[['Question']]
+    ground_truths = df_all[['Answer']]
+    
+    # creating QA chain
+    model_name = config.DEFAULT_MODEL_NAME
+    model, tokenizer,generation_config,embeddings = models[model_name]
+    max_ctx_size = 4096 #2048
+    kwargs = {
+        "n_ctx": max_ctx_size,
+        "max_tokens": max_ctx_size,
+        "n_threads": psutil.cpu_count(logical=False),
+        "max_tokens": max_ctx_size
+    }
+    pipe = pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    config={'max_length': 4096},
+    generation_config=generation_config,
+    model_kwargs=kwargs,
+    use_fast=True,
+    max_new_tokens=1024,
+    do_sample=False,
+    device=config.DEVICE #config.DEVICE #"cuda:0"
+    )
+    local_llm = HuggingFacePipeline(pipeline=pipe)
+    db = Chroma(
+        persist_directory=config.PERSIST_DIRECTORY,
+        embedding_function=embeddings,
+        client_settings=config.CHROMA_SETTINGS,
+    )
+        
+    retriever = db.as_retriever(search_kwargs={'k': 3})
+    template = """You are a helpful, respectful and honest assistant. Always answer as 
+        helpfully as possible, while being safe.
+
+        If a question does not make any sense, or is not factually coherent, explain 
+        why instead of answering something not correct. If you don't know the answer 
+        to a question, please don't share false information.
+
+        Your goal is to provide answers based only on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
+        the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot guess the answer from the provided contexts or if the context is empty,
+        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
+        
+
+        {context}
+
+        Question: {question}
+        Answer:"""
+
+    prompt = PromptTemplate(input_variables=["context", "question"], template=template)
+    memory = ConversationBufferMemory(input_key="question", memory_key="history")
+    qa = RetrievalQA.from_chain_type(
+        llm=local_llm, 
+        chain_type="stuff",
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": prompt}
+    )
+    
+    results = []
+    contexts = []
+    for idx, row in queries.iterrows():
+        query = row['Question']
+        result = qa({"query":query})
+        results.append(result['result'])
+        sources = result["source_documents"]
+        contents = [source.page_content for source in sources]
+        contexts.append(contents)
+    d = {
+    "question": queries['Question'].tolist(),
+    "answer": results,
+    "contexts": contexts,
+    "ground_truth": ground_truths['Answer'].tolist()
+    }
+    
+    dataset = Dataset.from_dict(d)
+    score = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_precision, context_recall, context_entity_recall, answer_similarity, answer_correctness, harmfulness])
+    score_df = score.to_pandas()
+    score_df.to_csv("EvaluationScores.csv", encoding="utf-8", index=False)
+
+    score_df[['faithfulness','answer_relevancy', 'context_precision', 'context_recall',
+       'context_entity_recall', 'answer_similarity', 'answer_correctness',
+       'harmfulness']].mean(axis=0)
+  
+    logger.info(f"RAG evaluation sucessful !!")
+    return "OK"
 
 @app.post("/api/v1/updatedb")
 def http_api_update_db():
