@@ -64,7 +64,7 @@ from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.document_loaders import SeleniumURLLoader
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from ragas.metrics import faithfulness, answer_relevancy, context_precision, context_recall, context_entity_recall, answer_similarity, answer_correctness
-
+from fastapi import FastAPI, Request
 #Houssam
 import hivedisk_api
 import numpy as np # linear algebra
@@ -121,8 +121,10 @@ def update_from_kaggle():
     return "OK"
     
 @app.post("/api/v1/evaluate")
-def evaluate_rag_with_kaggle_dataset():
+async def evaluate_rag_with_kaggle_dataset(request: Request):
     # Initialize the Kaggle API
+    data = await request.json()
+    subset_size = data.get("subset_size", None)  # Default is None, which means the entire dataset
     kaggleApi = KaggleApi()
     kaggleApi.authenticate()
     logger.info(f"kaggle authentication OK")
@@ -131,9 +133,16 @@ def evaluate_rag_with_kaggle_dataset():
     df_09 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S09_question_answer_pairs.txt"), sep='\t')
     df_10 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S10_question_answer_pairs.txt"), sep='\t', encoding = 'ISO-8859-1')
     df_all = pd.concat([df_08,df_09,df_10])
-    df_all_1 = df_all[['Question', 'Answer']]
-    queries = df_all[['Question']]
-    ground_truths = df_all[['Answer']]
+    
+    # Select a subset of the dataset if subset_size is specified
+    if subset_size is not None:
+        df_subset = df_all.sample(n=subset_size, random_state=42)
+    else:
+        df_subset = df_all
+    
+    #df_all_1 = df_all[['Question', 'Answer']]
+    queries = df_subset[['Question']]
+    ground_truths = df_subset[['Answer']]
     
     # creating QA chain
     model_name = config.DEFAULT_MODEL_NAME
@@ -194,13 +203,16 @@ def evaluate_rag_with_kaggle_dataset():
     
     results = []
     contexts = []
+    count = 0
     for idx, row in queries.iterrows():
+        logger.info(f"submitting query [{count}]...")
         query = row['Question']
         result = qa({"query":query})
         results.append(result['result'])
         sources = result["source_documents"]
         contents = [source.page_content for source in sources]
         contexts.append(contents)
+        count = count + 1
     d = {
     "question": queries['Question'].tolist(),
     "answer": results,
@@ -209,6 +221,7 @@ def evaluate_rag_with_kaggle_dataset():
     }
     
     dataset = Dataset.from_dict(d)
+    logger.info(f"starting evaluation of queries results...")
     score = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_precision, context_recall, context_entity_recall, answer_similarity, answer_correctness, harmfulness])
     score_df = score.to_pandas()
     score_df.to_csv("EvaluationScores.csv", encoding="utf-8", index=False)
