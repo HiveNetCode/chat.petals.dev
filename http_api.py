@@ -130,7 +130,7 @@ def evaluate_rag_with_kaggle_dataset():
     df_08 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S08_question_answer_pairs.txt"), sep='\t')
     df_09 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S09_question_answer_pairs.txt"), sep='\t')
     df_10 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S10_question_answer_pairs.txt"), sep='\t', encoding = 'ISO-8859-1')
-    df_all = df_08.append([df_09, df_10])
+    df_all = pd.concat([df_08,df_09,df_10])
     df_all_1 = df_all[['Question', 'Answer']]
     queries = df_all[['Question']]
     ground_truths = df_all[['Answer']]
