@@ -123,7 +123,7 @@ def update_from_kaggle():
 @app.post("/api/v1/evaluate")
 def evaluate_rag_with_kaggle_dataset():
     # Initialize the Kaggle API
-    data = request.json()
+    data = request.json
     subset_size = data.get("limit", None)  # Default is None, which means the entire dataset
     kaggleApi = KaggleApi()
     kaggleApi.authenticate()
