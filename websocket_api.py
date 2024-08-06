@@ -188,7 +188,7 @@ def ws_api_generate(ws):
         helpfully and naturally as possible, while being safe.
         
         Your goal is to provide answers based strictly on the following pieces of context. Go through the provided context and answer the given question strictly based on the provided contexts. If you cannot determine the answer from the provided context, please say that you don't know. 
-        Ensure your answer is clear and free of any metadata tags, special characters, or non-human readable characters such as '*/;}{ etc. Please ansewr directly without stating you're answering.
+        Ensure your answer is clear and free of any metadata tags, special characters, or non-human readable characters. Please ansewr directly without stating you are answering.
         
 
         {context}
