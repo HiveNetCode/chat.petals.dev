@@ -174,7 +174,16 @@ def evaluate_rag_with_kaggle_dataset():
     )
         
     retriever = db.as_retriever(search_kwargs={'k': 3})
-    template = """Go through the provided contexts and answer given question strictly based on contexts. If you cannot guess the answer from the provided contexts, please say that you don't know. Make sure your answer is clean and human-readable.
+    template = """You are a helpful, respectful and honest assistant. Always answer as 
+        helpfully and as naturally as possible, while being safe.
+
+        If a question does not make any sense, or is not factually coherent, explain 
+        why instead of answering something not correct. If you don't know the answer 
+        to a question, please don't share false information.
+
+        Your goal is to provide answers based strictly on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
+        the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot determine the answer from the provided contexts,
+        please say that you don't know or that it cannot be determined from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tags or non-human readable characters.
         
         {context}
 
@@ -322,7 +331,16 @@ def http_api_generate():
         #a.on_llm_new_token()
         #callbacks.append().on_llm_new_token()
         retriever = db.as_retriever(search_kwargs={'k': 4})
-        template = """Go through the provided contexts and answer given question strictly based on contexts. If you cannot guess the answer from the provided contexts, please say that you don't know. Make sure your answer is clean and human-readable.
+        template = """You are a helpful, respectful and honest assistant. Always answer as 
+        helpfully and as naturally as possible, while being safe.
+
+        If a question does not make any sense, or is not factually coherent, explain 
+        why instead of answering something not correct. If you don't know the answer 
+        to a question, please don't share false information.
+
+        Your goal is to provide answers based strictly on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
+        the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot determine the answer from the provided contexts,
+        please say that you don't know or that it cannot be determined from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tags or non-human readable characters.
 
         {context}
 
