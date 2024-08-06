@@ -136,7 +136,8 @@ def evaluate_rag_with_kaggle_dataset():
     
     # Select a subset of the dataset if subset_size is specified
     if subset_size is not None:
-        df_subset = df_all.sample(n=subset_size, random_state=42)
+        #df_subset = df_all.sample(n=subset_size, random_state=42)
+        df_subset = df_all.head(n=subset_size)
     else:
         df_subset = df_all
     
