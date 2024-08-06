@@ -184,16 +184,9 @@ def ws_api_generate(ws):
         #callbacks.append().on_llm_new_token()
         retriever = db.as_retriever(search_kwargs={'k': 3})
         # Create a system prompt 
-        template = """You are a helpful, respectful and honest assistant. Always answer as 
-        helpfully as possible, while being safe.
-
-        If a question does not make any sense, or is not factually coherent, explain 
-        why instead of answering something not correct. If you don't know the answer 
-        to a question, please don't share false information.
-
-        Your goal is to provide answers based only on the following pieces of context fetched from the company private knowledge database. Read the given context before answering questions and think step by step. If you can not answer a question based on 
-        the provided context, inform the user. Do not use any other information for answering questions. Provide a detailed answer to the question. If you cannot guess the answer from the provided contexts or if the context is empty,
-        please say that you don't know or that it cannot be guessed from the context, don't try to make up an answer. Please provide a clean answer rid of meta data tag or characters.
+        template = """Go through the context and answer given question strictly based on context. If you cannot guess the answer from the provided contexts or if the context is empty,
+        please say that you don't know.
+        Please make sure your answer is clean and free of any meta data tags or special characters.
         
 
         {context}
