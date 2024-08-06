@@ -174,9 +174,7 @@ def evaluate_rag_with_kaggle_dataset():
     )
         
     retriever = db.as_retriever(search_kwargs={'k': 3})
-    template = """Go through the context and answer given question strictly based on context. If you cannot guess the answer from the provided contexts or if the context is empty,
-        please say that you don't know.
-        Please make sure your answer is clean and free of any meta data tags or special characters.
+    template = """Go through the provided contexts and answer given question strictly based on contexts. If you cannot guess the answer from the provided contexts, please say that you don't know. Make sure your answer is clean and human-readable.
         
         {context}
 
@@ -324,9 +322,7 @@ def http_api_generate():
         #a.on_llm_new_token()
         #callbacks.append().on_llm_new_token()
         retriever = db.as_retriever(search_kwargs={'k': 4})
-        template = """Go through the context and answer given question strictly based on context. If you cannot guess the answer from the provided contexts or if the context is empty,
-        please say that you don't know.
-        Please make sure your answer is clean and free of any meta data tags or special characters.
+        template = """Go through the provided contexts and answer given question strictly based on contexts. If you cannot guess the answer from the provided contexts, please say that you don't know. Make sure your answer is clean and human-readable.
 
         {context}
 
