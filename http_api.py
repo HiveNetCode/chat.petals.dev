@@ -225,12 +225,20 @@ def evaluate_rag_with_kaggle_dataset():
     score = evaluate(dataset, metrics=[faithfulness, answer_relevancy, context_precision, context_recall, context_entity_recall, answer_similarity, answer_correctness, harmfulness])
     score_df = score.to_pandas()
     score_df.to_csv("EvaluationScores.csv", encoding="utf-8", index=False)
-
-    score_df[['faithfulness','answer_relevancy', 'context_precision', 'context_recall',
+    
+    all_scores = score_df[['faithfulness','answer_relevancy', 'context_precision', 'context_recall',
+       'context_entity_recall', 'answer_similarity', 'answer_correctness',
+       'harmfulness']]
+    mean_scores = score_df[['faithfulness','answer_relevancy', 'context_precision', 'context_recall',
        'context_entity_recall', 'answer_similarity', 'answer_correctness',
        'harmfulness']].mean(axis=0)
   
     logger.info(f"RAG evaluation sucessful !!")
+    logger.info(f"RESULTS [MEAN]: {mean_scores}")
+    # Save the scores to a CSV file
+    mean_scores.to_csv("MeanScores.csv", encoding="utf-8", header=True)
+    all_scores.to_csv("AllScores.csv", encoding="utf-8", header=True)
+    
     return "OK"
 
 @app.post("/api/v1/updatedb")
