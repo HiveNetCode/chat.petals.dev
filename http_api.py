@@ -206,8 +206,12 @@ def evaluate_rag_with_kaggle_dataset():
     count = 0
     for idx, row in queries.iterrows():
         logger.info(f"submitting query [{count}]...")
-        query = row['Question']
-        result = qa({"query":query})
+        query = str(row['Question'])
+        try:
+            result = qa({"query":query})
+        except Exception as e:
+            logger.warning(f"ignoring a non valid sample, err: {e}")
+            continue
         results.append(result['result'])
         sources = result["source_documents"]
         contents = [source.page_content for source in sources]
