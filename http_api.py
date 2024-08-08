@@ -214,10 +214,10 @@ def evaluate_rag_with_kaggle_dataset():
         contexts.append(contents)
         count = count + 1
     d = {
-    "question": queries['Question'].tolist(),
+    "question": queries['Question'].astype(str).tolist(),
     "answer": results,
     "contexts": contexts,
-    "ground_truth": ground_truths['Answer'].tolist()
+    "ground_truth": ground_truths['Answer'].astype(str).tolist()
     }
     
     dataset = Dataset.from_dict(d)
@@ -239,7 +239,9 @@ def evaluate_rag_with_kaggle_dataset():
     mean_scores.to_csv("MeanScores.csv", encoding="utf-8", header=True)
     all_scores.to_csv("AllScores.csv", encoding="utf-8", header=True)
     
-    return "OK"
+    return jsonify(mean_scores)
+    
+    #return "OK"
 
 @app.post("/api/v1/updatedb")
 def http_api_update_db():
