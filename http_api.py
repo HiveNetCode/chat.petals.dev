@@ -523,4 +523,6 @@ def remove_patterns_from_text(text: str, start_pattern: str) -> str:
         cleaned_output = text[answer_start + len(start_pattern):].strip()
     else:
         cleaned_output = text.strip()  # In case "Answer:" is not found
+    
+    cleaned_output = cleaned_output.strip('"')
     return cleaned_output
