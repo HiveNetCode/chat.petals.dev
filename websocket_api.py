@@ -160,7 +160,7 @@ def ws_api_generate(ws):
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        config={'max_length': 4096},
+        #config={'max_length': 4096},
         generation_config=generation_config,
         model_kwargs=kwargs,
         use_fast=True,
