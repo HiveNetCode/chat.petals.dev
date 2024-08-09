@@ -237,7 +237,11 @@ def evaluate_rag_with_kaggle_dataset():
         except Exception as e:
             logger.warning(f"ignoring a non valid sample, err: {e}")
             continue
-        results.append(result['result'])
+        pattern = "[/INST]"
+        answer = remove_patterns_from_text(result['result'],pattern)
+        pattern = "Answer:"
+        answer = remove_patterns_from_text(answer,pattern)
+        results.append(answer)
         sources = result["source_documents"]
         contents = [source.page_content for source in sources]
         contexts.append(contents)
@@ -511,3 +515,12 @@ def split_documents(documents: list[Document]) -> tuple[list[Document], list[Doc
             text_docs.append(doc)
 
     return text_docs, python_docs
+
+def remove_patterns_from_text(text: str, start_pattern: str) -> str:
+    answer_start = text.find(start_pattern)
+    cleaned_output = text
+    if answer_start != -1:
+        cleaned_output = text[answer_start + len(start_pattern):].strip()
+    else:
+        cleaned_output = text.strip()  # In case "Answer:" is not found
+    return cleaned_output
