@@ -134,6 +134,13 @@ def evaluate_rag_with_kaggle_dataset():
     df_10 = pd.read_csv(os.path.join(config.KAGGLE_DIRECTORY,"S10_question_answer_pairs.txt"), sep='\t', encoding = 'ISO-8859-1')
     df_all = pd.concat([df_08,df_09,df_10])
     
+    df_all.drop_duplicates(subset=['Question'],inplace=True)
+    # Drop rows with NULL or NaN values in 'Question' or 'Answer' columns
+    df_all.dropna(subset=['Question', 'Answer'], inplace=True)
+    
+    # Remove rows where 'Question' or 'Answer' text is exactly "NULL"
+    df_all = df_all[(df_all['Question'] != "NULL") & (df_all['Answer'] != "NULL")]
+    
     # Select a subset of the dataset if subset_size is specified
     if subset_size is not None:
         #df_subset = df_all.sample(n=subset_size, random_state=42)
@@ -243,7 +250,9 @@ def evaluate_rag_with_kaggle_dataset():
     mean_scores.to_csv("MeanScores.csv", encoding="utf-8", header=True)
     all_scores.to_csv("AllScores.csv", encoding="utf-8", header=True)
     
-    return jsonify(mean_scores)
+    # Convert mean_scores to a dictionary for JSON serialization
+    mean_scores_dict = mean_scores.to_dict()
+    return jsonify(mean_scores_dict)
     
     #return "OK"
 
