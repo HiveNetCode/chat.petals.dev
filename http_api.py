@@ -140,6 +140,8 @@ def evaluate_rag_with_kaggle_dataset():
     
     # Remove rows where 'Question' or 'Answer' text is exactly "NULL"
     df_all = df_all[(df_all['Question'] != "NULL") & (df_all['Answer'] != "NULL")]
+    # Randomize row positions
+    df_all = df_all.sample(frac=1).reset_index(drop=True)
     
     # Select a subset of the dataset if subset_size is specified
     if subset_size is not None:
@@ -198,7 +200,7 @@ def evaluate_rag_with_kaggle_dataset():
         Question: {question}
         Answer:"""
 
-    PROMPT_TEMPLATE = """[INST] <<SYS>>
+    PROMPT_TEMPLATE = """<s>[INST] <<SYS>>
     You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context. 
     <</SYS>>
     Context: {context}
