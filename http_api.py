@@ -198,15 +198,11 @@ def evaluate_rag_with_kaggle_dataset():
         Question: {question}
         Answer:"""
 
-    PROMPT_TEMPLATE = """
-    <s> <<SYS>> 
-    Go through the context and answer the question strictly based on the context. 
+    PROMPT_TEMPLATE = """[INST] <<SYS>>
+    You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context. 
     <</SYS>>
-
     Context: {context}
-    Question: {question}
-    Answer:
-    </s>
+    Question: {question} [/INST]
     """
     
     '''
