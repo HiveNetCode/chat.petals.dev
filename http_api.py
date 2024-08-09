@@ -198,6 +198,18 @@ def evaluate_rag_with_kaggle_dataset():
         Question: {question}
         Answer:"""
 
+    PROMPT_TEMPLATE = """
+    <s> <<SYS>> 
+    Go through the context and answer the question strictly based on the context. 
+    <</SYS>>
+
+    Context: {context}
+    Question: {question}
+    Answer:
+    </s>
+    """
+    
+    '''
     prompt = PromptTemplate(input_variables=["context", "question"], template=template)
     memory = ConversationBufferMemory(input_key="question", memory_key="history")
     qa = RetrievalQA.from_chain_type(
@@ -207,6 +219,13 @@ def evaluate_rag_with_kaggle_dataset():
         return_source_documents=True,
         chain_type_kwargs={"prompt": prompt}
     )
+    '''
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=local_llm,
+        retriever=retriever,
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": PromptTemplate.from_template(PROMPT_TEMPLATE)}
+    )
     
     results = []
     contexts = []
@@ -215,7 +234,8 @@ def evaluate_rag_with_kaggle_dataset():
         logger.info(f"submitting query [{count}]...")
         query = str(row['Question'])
         try:
-            result = qa({"query":query})
+            #result = qa({"query":query})
+            result = qa_chain({"query":query})
         except Exception as e:
             logger.warning(f"ignoring a non valid sample, err: {e}")
             continue
