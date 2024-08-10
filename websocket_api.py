@@ -182,7 +182,7 @@ def ws_api_generate(ws):
         #a = StreamingStdOutCallbackHandler()
         #a.on_llm_new_token()
         #callbacks.append().on_llm_new_token()
-        retriever = db.as_retriever(search_kwargs={'k': 3})
+        retriever = db.as_retriever(search_kwargs={'k': 2})
         # Create a system prompt 
         template = """<s>[INST] <<SYS>>
         You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context. 

@@ -94,7 +94,7 @@ def update_from_kaggle():
     logger.info(f"Loading Kaggle documents from {config.SOURCE_DIRECTORY}")
     documents = load_documents(config.SOURCE_DIRECTORY)
     text_documents, python_documents = split_documents(documents)
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=20)
     python_splitter = RecursiveCharacterTextSplitter.from_language(
         language=Language.PYTHON, chunk_size=412, chunk_overlap=50
     )
@@ -183,7 +183,7 @@ def evaluate_rag_with_kaggle_dataset():
         client_settings=config.CHROMA_SETTINGS,
     )
         
-    retriever = db.as_retriever(search_kwargs={'k': 3})
+    retriever = db.as_retriever(search_kwargs={'k': 2})
     template = """You are a helpful, respectful and honest assistant. Always answer as 
         helpfully and as naturally as possible, while being safe.
 
