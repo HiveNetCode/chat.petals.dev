@@ -67,7 +67,7 @@ def ws_api_generate(ws):
                         prompt = PromptTemplate(input_variables=["context", "question"], template=config.LLAMA_PROMPT_TEMPLATE)
                         filled_prompt = prompt.format(context=context,question=inputs)
                     
-                    logger.info(f"submitted_prompt = {filled_prompt}")      
+                    #logger.info(f"submitted_prompt = {filled_prompt}")      
                     inputs = tokenizer(filled_prompt, return_tensors="pt")["input_ids"].to(config.DEVICE)
                     n_input_tokens = inputs.shape[1]
                 else:
