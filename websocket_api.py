@@ -45,10 +45,10 @@ def ws_api_generate(ws):
 
                 if inputs is not None:
                     logger.info(f"user_inputs = {inputs}")
-                    device_type = config.DEVICE if torch.cuda.is_available() else "cpu"
+                    #device_type = config.DEVICE if torch.cuda.is_available() else "cpu"
                     embeddings = HuggingFaceInstructEmbeddings(
                         model_name=config.EMBEDDING_MODEL_NAME,
-                        model_kwargs={"device": device_type},
+                        model_kwargs={"device": config.DEVICE},
                     )
                     db = Chroma(
                         persist_directory=config.PERSIST_DIRECTORY,
@@ -130,7 +130,7 @@ def ws_api_generate(ws):
                         route_json = json.dumps(route_map)
                         #HIVE END
                         ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": source_json}))
-                        logger.info(f"source_docs = {source_json}")
+                        #logger.info(f"source_docs = {source_json}")
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
