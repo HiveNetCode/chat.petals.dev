@@ -1,6 +1,7 @@
 import os
 import torch
 from petals.constants import PUBLIC_INITIAL_PEERS
+from chromadb.config import Settings
 
 from data_structures import ModelBackendConfig, ModelChatConfig, ModelConfig, ModelFrontendConfig
 
@@ -57,7 +58,50 @@ MODEL_FAMILIES = {
      ],
       
 }
-#DEFAULT_MODEL_NAME = "mistralai/Mistral-7B-v0.1"
+
+# Define RAG Retrieval Settings
+CHUNK_SIZE = 1000
+TOP_K = 3
+CHUNK_OVERLAP = 20
+
+# Define RAG generation Settings
+LLAMA2_PROMPT_TEMPLATE = """<s>[INST] <<SYS>>
+You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context. 
+<</SYS>>
+Context: {context}
+Question: {question} [/INST]"""
+
+MIXTRAL_PROMPT_TEMPLATE = """<s>[INST] <<SYS>>
+You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context. 
+<</SYS>>
+Context: {context}
+Question: {question} [/INST]"""
+
+LLAMA_PROMPT_TEMPLATE = """
+### System:
+You are a helpful, respectful and honest assistant, go through the context and answer the question strictly based on the context.
+
+### User:
+Context: {context}
+Question: {question} 
+
+### Assistant:
+"""
+
+# Define the Chroma settings
+EMBEDDING_MODEL_NAME = "hkunlp/instructor-large"
+CHROMA_SETTINGS = Settings(
+    anonymized_telemetry=False,
+    is_persistent=True,
+)
+ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+# Define the folder for storing database
+SOURCE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS/text_data/text_data"
+KAGGLE_DIRECTORY = f"{ROOT_DIRECTORY}/SOURCE_DOCUMENTS"
+PERSIST_DIRECTORY = f"{ROOT_DIRECTORY}/DB"
+KAGGLE_DATASET = "rtatman/questionanswer-dataset"
+STOP_TOKEN = "###"
+
 HF_ACCESS_TOKEN = "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"
 INITIAL_PEERS = []
 BOOTSTRAP_PEERS = os.environ['INITIAL_PEERS']
@@ -70,7 +114,15 @@ if BOOTSTRAP_PEERS != "":
 # Set this to a list of multiaddrs to connect to a private swarm instead of the public one, for example:
 # INITIAL_PEERS = ['/ip4/10.1.2.3/tcp/31234/p2p/QmcXhze98AcgGQDDYna23s4Jho96n8wkwLJv78vxtFNq44']
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" #if torch.cuda.is_available() else "cpu"
+GPU_INDEX = ""
+try: 
+    GPU_INDEX =  os.environ['DEVICE']
+except Exception as e:
+    pass 
+
+if GPU_INDEX != "":
+    DEVICE = GPU_INDEX
 
 try:
     from cpufeature import CPUFeature
@@ -79,7 +131,7 @@ try:
 except ImportError:
     has_avx512 = False
 
-if DEVICE == "cuda":
+if DEVICE.startswith("cuda"):
     TORCH_DTYPE = "auto"
 elif has_avx512:
     TORCH_DTYPE = torch.bfloat16

@@ -24,8 +24,10 @@ RUN conda install python~=3.10.12 pip && \
 VOLUME /root/.cache
 
 COPY . chat.petals.dev/
+COPY kaggle.json /root/.kaggle/
 WORKDIR /home/chat.petals.dev
 RUN mkdir -p SOURCE_DOCUMENTS
+VOLUME /home/chat.petals.dev/SOURCE_DOCUMENTS
 RUN pip install -r requirements.txt
 
 CMD ["flask", "run","--host","0.0.0.0","--port","8181"]

@@ -1,5 +1,7 @@
 import json
+import os
 from traceback import format_exc
+from typing import List, Dict,Tuple
 
 import flask_sock
 import hivemind
@@ -10,7 +12,12 @@ from app import models, sock
 from utils import safe_decode
 
 logger = hivemind.get_logger(__file__)
-
+# RAG imports
+from langchain.embeddings import HuggingFaceInstructEmbeddings
+from langchain.vectorstores import Chroma
+import torch
+from langchain.prompts import PromptTemplate
+from langchain.docstore.document import Document
 
 @sock.route("/api/v2/generate")
 def ws_api_generate(ws):
@@ -28,7 +35,7 @@ def ws_api_generate(ws):
         with model.inference_session(max_length=max_length) as session:
             ws.send(json.dumps({"ok": True}))
             
-
+            source_json = {}
             while True:
                 request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
                 assert request["type"] == "generate"
@@ -37,7 +44,31 @@ def ws_api_generate(ws):
                 logger.info(f"ws.generate.step(), inputs={repr(inputs)}")
 
                 if inputs is not None:
-                    inputs = tokenizer(inputs, return_tensors="pt")["input_ids"].to(config.DEVICE)
+                    logger.info(f"user_inputs = {inputs}")
+                    device_type = config.DEVICE if torch.cuda.is_available() else "cpu"
+                    embeddings = HuggingFaceInstructEmbeddings(
+                        model_name=config.EMBEDDING_MODEL_NAME,
+                        model_kwargs={"device": device_type},
+                    )
+                    db = Chroma(
+                        persist_directory=config.PERSIST_DIRECTORY,
+                        embedding_function=embeddings,
+                        client_settings=config.CHROMA_SETTINGS,
+                    )
+                    retriever = db.as_retriever(search_kwargs={'k': config.TOP_K})
+                    docs = retriever.get_relevant_documents(query=inputs)
+                    source_docs, context = fetch_contexts_and_sources(docs)
+                    source_json = json.dumps(source_docs)
+                    filled_prompt = ""
+                    if str(model_name).upper().find("LLAMA-2") !=-1 or str(model_name).upper().find("MIXTRAL") !=-1:
+                        prompt = PromptTemplate(input_variables=["context", "question"], template=config.LLAMA2_PROMPT_TEMPLATE)
+                        filled_prompt = prompt.format(context=context,question=inputs)
+                    else:
+                        prompt = PromptTemplate(input_variables=["context", "question"], template=config.LLAMA_PROMPT_TEMPLATE)
+                        filled_prompt = prompt.format(context=context,question=inputs)
+                    
+                    logger.info(f"submitted_prompt = {filled_prompt}")      
+                    inputs = tokenizer(filled_prompt, return_tensors="pt")["input_ids"].to(config.DEVICE)
                     n_input_tokens = inputs.shape[1]
                 else:
                     n_input_tokens = 0
@@ -98,7 +129,8 @@ def ws_api_generate(ws):
                             #logger.info(f"HIVE: PeerID = {sid.span.peer_id}; BLOCKS = {sid.span.start},{sid.span.end}")
                         route_json = json.dumps(route_map)
                         #HIVE END
-                        ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json}))
+                        ws.send(json.dumps({"ok": True, "outputs": outputs, "stop": stop, "token_count": token_count, "route":route_json, "source_documents": source_json}))
+                        logger.info(f"source_docs = {source_json}")
     except flask_sock.ConnectionClosed:
         pass
     except Exception:
@@ -106,3 +138,23 @@ def ws_api_generate(ws):
         ws.send(json.dumps({"ok": False, "traceback": format_exc()}))
     finally:
         logger.info(f"ws.generate.close()")
+        
+
+def fetch_contexts_and_sources(documents: List[Document]) -> Tuple[Dict[str, str], str]:
+        #self.source_documents.extend(documents)
+        temp ={}
+        source_documents = {}
+        context_list = []
+        for doc in documents:
+            filename = os.path.basename(doc.metadata['source'])
+            if  source_documents.get(filename) is not None:
+                temp[filename] = temp[filename] +1
+                source_documents[filename + " (" + str(temp[filename]) + ")"] = doc.page_content
+                context_list.append(doc.page_content)
+            else:
+               temp[filename] = 0
+               source_documents[filename] = doc.page_content
+               context_list.append(doc.page_content)
+        context = "\n".join(context_list)
+        return source_documents,context
+                

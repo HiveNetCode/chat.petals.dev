@@ -3,11 +3,51 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" class="js-site-favicon" type="image/png" href="./static/hive.png">
+    <link rel="icon" class="js-site-favicon" type="image/png" href="./static/HiveCompute_Icon_RGB.png">
     <title>Hive &ndash; Distributed Inference PoC</title>
     <link href="./static/bootstrap.min.css" rel="stylesheet">
     <link href="./static/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const hiveForm = document.getElementById("hivediskForm");
+        const loadingIndicator2 = document.getElementById("loading-indicator2");
+        const resultMessage2 = document.getElementById("result-message2");
+
+        hiveForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+          const formData = new FormData(hiveForm);
+          resultMessage2.style.display = "none";
+
+          loadingIndicator2.style.display = "block";
+          loadingIndicator2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
+          fetch("/api/v1/gethivedisk", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.text())
+            .then((responseText) => {
+              loadingIndicator2.style.display = "none";
+
+              if (responseText.trim() === "OK") {
+                resultMessage2.style.color = "green";
+              } else {
+                resultMessage2.style.color = "red";
+              }
+
+              resultMessage2.textContent = responseText;
+              resultMessage2.style.display = "block";
+            })
+            .catch((error) => {
+              console.error("Error updating from Kaggle:", error);
+              loadingIndicator2.style.display = "none";
+              resultMessage2.style.display = "none";
+            });
+        });
+      });
+    </script>
   </head>
   <body class="dark-mode">
 
@@ -16,20 +56,18 @@
     <div class="col-lg-6 col-md-8 p-md-3 mx-auto my-3" style="max-width: 700px;">
       <div class="mb-4">
         <div class="d-md-inline-block pe-md-4" >
-          <a target="_blank" href="https://hivenet.com" ><img src="./static/hive.png" height="60" ></a>
+          <a target="_blank" href="https://hivenet.com" ><img src="./static/HiveCompute_Icon_RGB.png" height="55" ></a>
         </div>
         <h1 class="display-4 fw-bold d-md-inline-block white-color justify-content-center" style="font-size: 40pt; vertical-align: middle;">
           hive
-          <span style="font-size: 25pt; color: #e1ff01;">Chat</span> <span style="font-size: 12pt; color: #c9d0d7df;">(pubic)</span>
+          <span style="font-size: 25pt; color: #e1ff01;">Chat</span>  <span style="font-size: 12pt; color: #c9d0d7df;">(Kaggle <a target="_blank" href="https://www.kaggle.com/datasets/rtatman/questionanswer-dataset/data"> QA/Wikipedia Dataset</a>)</span>
         </h1>
       </div>
       <div class="welcome mb-4">
         <div>
-          <b>Welcome!</b> This PoC demonstrates distributed GPU-based inference with the
+          <b>Welcome!</b> This is a RAG app running
           <a target="_blank" class="model-name" href="{{ default_model.frontend.model_card }}">{{ default_model.frontend.name }}</a> model.
-           In this PoC, all the blocks and weights of the model are distributed across a private
-          <a target="_blank" href="http://57.128.107.69:31888">cluster</a> of compute nodes.
-   
+          over a private <a target="_blank" href="http://57.128.41.80:31888/">cluster</a>.
         </div>
         <form id="settings">
           <div class="mt-2">
@@ -60,6 +98,20 @@
             {% endfor %}
           </div>
         </form>
+        <br>
+        <div>
+          <form id="hivediskForm" method="POST" action="">
+            <div class="form-group">
+              <label for="loadButton"><b>Update From Kaggle:</b></label>
+              <div class="submit-container">
+                <input type="submit" id="loadButton" value="Load">
+                <div id="loading-indicator2"></div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div id="result-message2" style="color: red;"></div>
+
       </div>
       
       <div class="dialogue">
