@@ -164,6 +164,7 @@ def evaluate_rag_with_kaggle_dataset():
     
     results = []
     contexts = []
+    questions = []
     count = 0
     do_sample = get_typed_arg("do_sample", int, False)
     temperature = get_typed_arg("temperature", float)
@@ -203,6 +204,7 @@ def evaluate_rag_with_kaggle_dataset():
         except Exception as e:
             logger.warning(f"ignoring a non valid sample, err: {e}")
             continue
+        questions.append(query)
         pattern = "[/INST]"
         answer = remove_patterns_from_text(result,pattern)
         pattern = "Answer:"
@@ -214,7 +216,7 @@ def evaluate_rag_with_kaggle_dataset():
         contexts.append(contents)
         count = count + 1
     d = {
-    "question": queries['Question'].astype(str).tolist(),
+    "question": questions,
     "answer": results,
     "contexts": contexts,
     "ground_truth": ground_truths['Answer'].astype(str).tolist()
