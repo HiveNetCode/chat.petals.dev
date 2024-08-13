@@ -91,7 +91,7 @@
               {% for model in family_models %}
               {% set model_id = model.backend.key.lower().replace("/", "-") %}
               <input type="radio" class="btn-check" name="model" value="{{ model.backend.key }}" id="{{ model_id }}"
-                  {% if family_loop.first %}checked{% endif %}>
+                  {% if family_loop.first and loop.first %}checked{% endif %}>
               <label class="btn btn-outline-primary" for="{{ model_id }}">{{ model.frontend.name }}</label>
               {% endfor %}
             </div>

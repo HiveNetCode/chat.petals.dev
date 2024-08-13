@@ -25,6 +25,8 @@ def ws_api_generate(ws):
         request = json.loads(ws.receive(timeout=config.STEP_TIMEOUT))
         assert request["type"] == "open_inference_session"
         model_name = request["model"]
+        if str(model_name).upper().find("LLAMA-2") ==-1 or str(model_name).upper().find("MIXTRAL") ==-1:
+            model_name = config.MIXTRAL_MODEL_NAME
         max_length = request["max_length"]
         logger.info(f"ws.generate.open(), {model_name=}, {max_length=}, {http_request.origin=}")
 

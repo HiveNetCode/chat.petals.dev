@@ -14,17 +14,7 @@ default_chat_config = ModelChatConfig(
 )
 
 MODEL_FAMILIES = {
-    "Mistral": [
-         ModelConfig(
-            ModelBackendConfig(repository="mistralai/Mixtral-8x7B-Instruct-v0.1"),
-            ModelFrontendConfig(
-                name="Mixtral 8x7B",
-                model_card="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
-                license="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/tree/main",
-            ),
-            default_chat_config,
-        ),
-    ],
+    
     
     "Llama 2": [
         ModelConfig(
@@ -38,9 +28,21 @@ MODEL_FAMILIES = {
         ),
     ],
     
+    "Mistral": [
+         ModelConfig(
+            ModelBackendConfig(repository="mistralai/Mixtral-8x7B-Instruct-v0.1"),
+            ModelFrontendConfig(
+                name="Mixtral 8x7B",
+                model_card="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1",
+                license="https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1/tree/main",
+            ),
+            default_chat_config,
+        ),
+    ],
+    
       
 }
-
+MIXTRAL_MODEL_NAME = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 # Define RAG Retrieval Settings
 CHUNK_SIZE = 1000
 TOP_K = 4
