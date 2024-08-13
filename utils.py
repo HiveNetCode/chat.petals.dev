@@ -4,9 +4,10 @@ import hivemind
 import torch
 from petals import AutoDistributedModelForCausalLM
 from transformers import AutoTokenizer, PreTrainedModel, PreTrainedTokenizer
-
+from langchain.docstore.document import Document
 import config
 from data_structures import ModelConfig
+import os
 
 logger = hivemind.get_logger(__file__)
 
@@ -47,3 +48,21 @@ def safe_decode(tokenizer: PreTrainedTokenizer, outputs: Union[torch.Tensor, Lis
 
     # We use .lstrip() since SentencePiece may add leading spaces, e.g. if the outputs are "</s>"
     return result.lstrip()[1:]
+
+def fetch_contexts_and_sources(documents: List[Document]) -> Tuple[Dict[str, str], str]:
+        #self.source_documents.extend(documents)
+        temp ={}
+        source_documents = {}
+        context_list = []
+        for doc in documents:
+            filename = os.path.basename(doc.metadata['source'])
+            if  source_documents.get(filename) is not None:
+                temp[filename] = temp[filename] +1
+                source_documents[filename + " (" + str(temp[filename]) + ")"] = doc.page_content
+                context_list.append(doc.page_content)
+            else:
+               temp[filename] = 0
+               source_documents[filename] = doc.page_content
+               context_list.append(doc.page_content)
+        context = "\n".join(context_list)
+        return source_documents,context
