@@ -16,7 +16,7 @@ default_chat_config = ModelChatConfig(
 MODEL_FAMILIES = {
     
     
-    "Llama 2": [
+    "ALL": [
         ModelConfig(
             ModelBackendConfig(repository="meta-llama/Llama-2-70b-chat-hf"),
             ModelFrontendConfig(
@@ -26,10 +26,7 @@ MODEL_FAMILIES = {
             ),
             default_chat_config,
         ),
-    ],
-    
-    "Mistral": [
-         ModelConfig(
+        ModelConfig(
             ModelBackendConfig(repository="mistralai/Mixtral-8x7B-Instruct-v0.1"),
             ModelFrontendConfig(
                 name="Mixtral 8x7B",
@@ -39,8 +36,7 @@ MODEL_FAMILIES = {
             default_chat_config,
         ),
     ],
-    
-      
+     
 }
 MIXTRAL_MODEL_NAME = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 # Define RAG Retrieval Settings
