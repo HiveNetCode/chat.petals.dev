@@ -60,9 +60,9 @@ MODEL_FAMILIES = {
 }
 
 # Define RAG Retrieval Settings
-CHUNK_SIZE = 1000
-TOP_K = 3
-CHUNK_OVERLAP = 20
+CHUNK_SIZE = 1500
+TOP_K = 4
+CHUNK_OVERLAP = 200
 
 # Define RAG generation Settings
 LLAMA2_PROMPT_TEMPLATE = """<s>[INST] <<SYS>>
