@@ -176,17 +176,18 @@ def evaluate_rag_with_kaggle_dataset():
     for idx, row in queries.iterrows():
         logger.info(f"submitting query [{count}]...")
         query = str(row['Question'])
+        result = ""
         try:
-            docs = retriever.get_relevant_documents(query=inputs)
+            docs = retriever.get_relevant_documents(query=query)
             source_docs, context = fetch_contexts_and_sources(docs)
             source_json = json.dumps(source_docs)
             filled_prompt = ""
             if str(model_name).upper().find("LLAMA-2") !=-1 or str(model_name).upper().find("MIXTRAL") !=-1:
                 prompt = PromptTemplate(input_variables=["context", "question"], template=config.LLAMA2_PROMPT_TEMPLATE)
-                filled_prompt = prompt.format(context=context,question=inputs)
+                filled_prompt = prompt.format(context=context,question=query)
             else:
                 prompt = PromptTemplate(input_variables=["context", "question"], template=config.LLAMA_PROMPT_TEMPLATE)
-                filled_prompt = prompt.format(context=context,question=inputs)   
+                filled_prompt = prompt.format(context=context,question=query)   
                  
             inputs = tokenizer(filled_prompt, return_tensors="pt")["input_ids"].to(config.DEVICE)
             n_input_tokens = inputs.shape[1]
@@ -198,17 +199,19 @@ def evaluate_rag_with_kaggle_dataset():
                 max_length=8192,
                 max_new_tokens=1024,
             )
-            outputs = safe_decode(tokenizer, outputs[0, n_input_tokens:])
+            result = safe_decode(tokenizer, outputs[0, n_input_tokens:])
         except Exception as e:
             logger.warning(f"ignoring a non valid sample, err: {e}")
             continue
         pattern = "[/INST]"
-        answer = remove_patterns_from_text(outputs,pattern)
+        answer = remove_patterns_from_text(result,pattern)
         pattern = "Answer:"
         answer = remove_patterns_from_text(answer,pattern)
         results.append(answer)
+        contents = []
         for doc in source_docs.values():
-           contexts.append(doc) 
+           contents.append(doc) 
+        contexts.append(contents)
         count = count + 1
     d = {
     "question": queries['Question'].astype(str).tolist(),
