@@ -14,18 +14,7 @@ default_chat_config = ModelChatConfig(
 )
 
 MODEL_FAMILIES = {
-    "Llama 2": [
-        ModelConfig(
-            ModelBackendConfig(repository="meta-llama/Llama-2-70b-chat-hf"),
-            ModelFrontendConfig(
-                name="Llama 2 (70B-Chat)",
-                model_card="https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
-                license="https://bit.ly/llama2-license",
-            ),
-            default_chat_config,
-        ),
-    ],
-    "Mixtral": [
+    "Mistral": [
          ModelConfig(
             ModelBackendConfig(repository="mistralai/Mixtral-8x7B-Instruct-v0.1"),
             ModelFrontendConfig(
@@ -37,26 +26,18 @@ MODEL_FAMILIES = {
         ),
     ],
     
-    "Llama": [
-         ModelConfig(
-             ModelBackendConfig(repository="huggyllama/llama-65b"),
-             ModelFrontendConfig(
-                 name="Llama-65B",
-                 model_card="https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
-                 license="https://bit.ly/llama-license",
-             ),
-             default_chat_config,
-         ),
+    "Llama 2": [
         ModelConfig(
-             ModelBackendConfig(repository="huggyllama/llama-7b"),
-             ModelFrontendConfig(
-                 name="Llama-7B",
-                 model_card="https://github.com/facebookresearch/llama/blob/llama_v1/MODEL_CARD.md",
-                 license="https://bit.ly/llama-license",
-             ),
-             default_chat_config,
-         ),
-     ],
+            ModelBackendConfig(repository="meta-llama/Llama-2-70b-chat-hf"),
+            ModelFrontendConfig(
+                name="Llama 2 (70B-Chat)",
+                model_card="https://huggingface.co/meta-llama/Llama-2-70b-chat-hf",
+                license="https://bit.ly/llama2-license",
+            ),
+            default_chat_config,
+        ),
+    ],
+    
       
 }
 
