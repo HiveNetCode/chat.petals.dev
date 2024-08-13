@@ -42,7 +42,7 @@ MODEL_FAMILIES = {
 }
 
 # Define RAG Retrieval Settings
-CHUNK_SIZE = 1500
+CHUNK_SIZE = 1000
 TOP_K = 4
 CHUNK_OVERLAP = 200
 
