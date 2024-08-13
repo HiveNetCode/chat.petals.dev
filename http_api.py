@@ -215,11 +215,17 @@ def evaluate_rag_with_kaggle_dataset():
            contents.append(doc) 
         contexts.append(contents)
         count = count + 1
+        
+    expected_answers = ground_truths['Answer'].astype(str).tolist()
+    if len(questions) > 0:
+        expected_answers = expected_answers[:len(questions)]
+    else:
+        expected_answers = []
     d = {
     "question": questions,
     "answer": results,
     "contexts": contexts,
-    "ground_truth": ground_truths['Answer'].astype(str).tolist()
+    "ground_truth": expected_answers
     }
     
     dataset = Dataset.from_dict(d)
