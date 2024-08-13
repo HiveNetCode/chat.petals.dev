@@ -196,7 +196,7 @@ def evaluate_rag_with_kaggle_dataset():
                 do_sample=1,
                 temperature=0.6,
                 top_p=0.9,
-                max_length=8192,
+                #max_length=8192,
                 max_new_tokens=1024,
             )
             result = safe_decode(tokenizer, outputs[0, n_input_tokens:])
